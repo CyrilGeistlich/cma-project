@@ -6,7 +6,7 @@ Analysis Geo 880**
 | Semester:      | FS23                                     |
 |:---------------|:---------------------------------------- |
 | **Data:**      | Movement data (Posmo Project)            |
-| **Title:**     |                               |
+| **Title:**     | "Automated Transportation Mode Differentiation using GPS Tracking Data: Exploring Factors, Features, and Machine Learning Approaches"                              |
 | **Student 1:** | Cyril Geistlich                          |
 | **Student 2:** | Micha Franz                              |
 
@@ -36,7 +36,7 @@ The main data set is tracking data gathered by the Posmo Project. The data inclu
 ## Analytical concepts
 <!-- Which analytical concepts will you use? What conceptual movement spaces and respective modelling approaches of trajectories will you be using? What additional spatial analysis methods will you be using? -->
 
-We will try to deduce as many parameters from the GPS tracking data as possible. We then want to conduct a principle componenet analysis to find the components which contribute to 90% of the variability. We then will use these principal componenets to train our model. We will evaluate different methods using accuracy measures such as recall, precision and F1-Score. We will apply k-fold cross validation.
+We will try to deduce as many parameters from the GPS tracking data as possible, such as velocity, acceleration, trip duration, turning angle, slope, time and position .We then want to conduct a principle componenet analysis to find the components which contribute to 90% of the variability. We then will use these principal componenets to train our model. We will evaluate different methods using accuracy measures such as recall, precision and F1-Score. We will apply k-fold cross validation.
 
 ## R concepts
 <!-- Which R concepts, functions, packages will you mainly use. What additional spatial analysis methods will you be using? -->
@@ -57,4 +57,4 @@ If the machine learning approach turns out to be to complex/time consuming we wo
 
 ## Questions? 
 <!-- Which questions would you like to discuss at the coaching session? -->
-Is our project to ambitious???
+Is it realist for us to implement a machine learning algorithm in this course or would it be better to apply other methods to classify the mode of transportation?
