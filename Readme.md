@@ -22,6 +22,11 @@ Analysis Geo 880**
 ## Data
 <!-- What data will you use? Will you require additional context data? Where do you get this data from? Do you already have all the data? -->
 
+<!-- The main data set is tracking data gathered by the Posmo Project. The data includes GPS position and automatically assigned labels corresponding to the mode of movement. The Posmo Project is available as a downloadable smartphone application and reads the GPS position for the user with sampling intervals of 5 to 10 seconds. Ideally, we retrieve continuous data, but we expect there to be varying sampling rates throughout the data set.
+
+This data is going to be combined with data from.. xy
+-->
+
 ## Analytical concepts
 <!-- Which analytical concepts will you use? What conceptual movement spaces and respective modelling approaches of trajectories will you be using? What additional spatial analysis methods will you be using? -->
 
