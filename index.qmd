@@ -1,7 +1,7 @@
 ---
 title: The title of your Semesterproject
 subtitle: A subtle subtitle
-author: Firstname1 Lastname1 and Firstname2 Lastname2
+author: Cyril Geistlich and Micha Franz
 output: html
 ---
 
@@ -27,36 +27,15 @@ output: html
 
 ## Abstract
 
-<!-- the following is just a placeholder text, remove it!-->
-Society philosophy merciful selfish sexuality depths overcome madness. Morality free faithful merciful ubermensch good oneself convictions intentions eternal-return. Spirit against christianity right selfish evil ultimate pious hatred ocean dead insofar noble. Madness pious madness christianity prejudice horror grandeur god strong. Ideal will philosophy reason pious society burying ascetic right society philosophy. Society will evil intentions against philosophy against holiest victorious.
 
+This project aims to investigate key factors and features in GPS tracking data to differentiate transportation vehicles. Machine learning is applied to automate transportation mode detection using spatial, temporal, and attribute analysis. Manual verification of results ensures accuracy. The findings contribute to computational movement analysis and automated transportation mode detection.
 
 ## Introduction
 
-<!-- the following is just a placeholder text, remove it!-->
-Against holiest pinnacle mountains merciful ideal society play disgust will ubermensch ultimate pinnacle victorious. Snare value law gains battle pious intentions revaluation strong. Insofar snare faith ideal oneself.
+## Research Question
 
-```{r}
-library(ggplot2)
-
-# Include tables with the function "kable"
-
-knitr::kable(head(mtcars))
-```
-
-<!-- the following is just a placeholder text, remove it!-->
-Revaluation evil aversion ultimate decrepit disgust decrepit eternal-return noble faithful pinnacle. Truth ascetic inexpedient decrepit free. Ubermensch free merciful mountains endless fearful decieve reason mountains will decrepit strong selfish depths. Overcome faith snare gains oneself transvaluation.
-
-```{r}
-# include plots automatically
-
-ggplot(mtcars, aes(cyl, disp)) +
-  geom_point()
-
-```
-
-
-
+What are the key factors and features that can be extracted from GPS tracking data to differentiate between different types of transportation modes?
+How can machine learning techniques be applied to GPS tracking data to automate the detection of the mode of transportation and which accuracies can be achieved by different machine learning algorithms?
 
 
 ## Material and Methods
@@ -74,3 +53,32 @@ Philosophy oneself passion play fearful self noble zarathustra deceptions sexual
 <!-- the following is just a placeholder text, remove it!-->
 Justice convictions spirit sexuality insofar free marvelous joy. Revaluation virtues mountains spirit fearful sexuality love endless. Society intentions will noble burying aversion moral. Insofar passion ultimate mountains of play gains depths joy christian reason christianity mountains dead. Mountains christianity play war holiest ascetic passion oneself derive grandeur. Against pinnacle hope joy burying ocean of horror disgust victorious faithful justice suicide.
 
+
+## Code
+
+# 1. Data Prep
+## 1.1 Read Data
+## 1.2 Clean Data (if necessary)
+## 1.3 Calculate Movement Parameters
+### 1.3.1 Speed
+### 1.3.2 Acceleration
+### 1.3.3 Sinuosity
+### 1.3.4 Closeness to Traffic Network
+### 1.3.5 Water Bodies (For boats)
+### 1.3.6 Slope?
+### 
+
+# 2.PCA
+
+
+# 3. Categories
+Walk (Running?)
+Bike
+Train
+Tram
+Bus
+Car
+Skateboard
+Scooter
+Boat
+Other
