@@ -55,23 +55,60 @@ Justice convictions spirit sexuality insofar free marvelous joy. Revaluation vir
 
 
 ## Code
+```{r}
+library("dplyr")
+library("sf")
+library("readr") 
+library("ggplot2") # to visualize data
+library("mapview")
+library("lubridate")
+```
+
 
 # 1. Data Prep
 ## 1.1 Read Data
-## 1.2 Clean Data (if necessary)
-## 1.3 Calculate Movement Parameters
-### 1.3.1 Speed
-### 1.3.2 Acceleration
-### 1.3.3 Sinuosity
-### 1.3.4 Closeness to Traffic Network
-### 1.3.5 Water Bodies (For boats)
-### 1.3.6 Slope?
-### 
 
-# 2.PCA
+```{r}
+
+posmo_raw <- read.delim("data/posmo_26_05_2023.csv",sep=",")
+posmo_raw <- st_as_sf(posmo_raw,coords=c("lon_x", "lat_y"), crs = 2056)
+mapview(posmo_raw)
+
+posmo_truth <- read.delim("data/posmo_26_05_2023.csv",sep=",")
+posmo_truth <- st_as_sf(posmo_raw,coords=c("lon_x", "lat_y"), crs = 2056)
+posmo_truth <- posmo_truth[,-c(1,3,4)]
+posmo_truth$datetime <- ymd_hms(posmo_truth$datetime) + hours(2)
+  
+```
+
+
+## 1.2 Clean Data (if necessary)?
+## 1.3 Segmentation?
+## 1.4 Calculate Movement Parameters
+### 1.4.1 Speed/ Additional Moving Window Speed?
+
+```{r Calc Diff_s, steplength, speed_ms}
+coords <- data.frame(st_coordinates(posmo_truth))
+posmo_truth <- posmo_truth |> mutate(diff_s = as.numeric(difftime(lead(datetime),datetime))) |>
+  mutate(diff_s = as.numeric(difftime(lead(datetime),datetime))) |>
+  mutate(steplength = ((coords$X - lead(coords$X))^2 + (coords$Y - lead(coords$Y))^2)^0.5) |>
+  mutate(speed_ms = as.numeric(steplength/diff_s))
+posmo_truth <- posmo_truth[!is.infinite(posmo_truth$speed_ms), na.omit = TRUE]
+```
+
+### 1.4.2 Acceleration /Moving Window?
+### 1.4.3 Sinuosity /Moving Window?
+### 1.4.4 Closeness to Traffic Network
+### 1.4.5 Water Bodies (For boats)
+### 1.4.6 Slope?
+### 1.4.7 Average Distance between points in section
+### FUrther Parameters!
+
+# 2.PCA?
 
 
 # 3. Categories
+Stationary?
 Walk (Running?)
 Bike
 Train
@@ -82,3 +119,9 @@ Skateboard
 Scooter
 Boat
 Other
+
+# 4. Cluster
+
+# 5. ANN
+
+# 6. Evaluation
