@@ -62,22 +62,33 @@ library("readr")
 library("ggplot2") # to visualize data
 library("mapview")
 library("lubridate")
+library("zoo")
+library(caret) # Classification package
 ```
 
 
 # 1. Data Prep
 ## 1.1 Read Data
 
-```{r}
+```{r read data}
 
-posmo_raw <- read.delim("data/posmo_26_05_2023.csv",sep=",")
-posmo_raw <- st_as_sf(posmo_raw,coords=c("lon_x", "lat_y"), crs = 2056)
-mapview(posmo_raw)
+# posmo_raw <- read.delim("data/posmo_26_05_2023.csv",sep=",")
+# posmo_raw <- st_as_sf(posmo_raw,coords=c("lon_x", "lat_y"), crs = 2056)
+# mapview(posmo_raw)
 
 posmo_truth <- read.delim("data/posmo_26_05_2023.csv",sep=",")
-posmo_truth <- st_as_sf(posmo_raw,coords=c("lon_x", "lat_y"), crs = 2056)
+posmo_truth <- st_as_sf(posmo_truth, coords = c("lon_x", "lat_y"), crs = 4326) |>
+   st_transform(posmo_truth, crs = 2056)
+
+# Remove unwanted columns
 posmo_truth <- posmo_truth[,-c(1,3,4)]
+
+# Fix Timestamp
 posmo_truth$datetime <- ymd_hms(posmo_truth$datetime) + hours(2)
+
+#Ad ID to rows
+posmo_truth <- posmo_truth |>
+  mutate(id = row_number())
   
 ```
 
@@ -87,22 +98,111 @@ posmo_truth$datetime <- ymd_hms(posmo_truth$datetime) + hours(2)
 ## 1.4 Calculate Movement Parameters
 ### 1.4.1 Speed/ Additional Moving Window Speed?
 
-```{r Calc Diff_s, steplength, speed_ms}
-coords <- data.frame(st_coordinates(posmo_truth))
-posmo_truth <- posmo_truth |> mutate(diff_s = as.numeric(difftime(lead(datetime),datetime))) |>
+```{r Calc Diff_s, steplength, velocity}
+#Create Coord Column
+coords <- data.frame(st_coordinates(posmo_truth), posmo_truth$id)
+
+#Calculate Time Difference between steps (diff_s), steplenght and velocity. 
+posmo_truth <- posmo_truth |> 
   mutate(diff_s = as.numeric(difftime(lead(datetime),datetime))) |>
   mutate(steplength = ((coords$X - lead(coords$X))^2 + (coords$Y - lead(coords$Y))^2)^0.5) |>
-  mutate(speed_ms = as.numeric(steplength/diff_s))
-posmo_truth <- posmo_truth[!is.infinite(posmo_truth$speed_ms), na.omit = TRUE]
+  mutate(velocity = as.numeric(steplength/diff_s)) |>
+  filter(diff_s != 0)
+
+coords <- data.frame(st_coordinates(posmo_truth), posmo_truth$id)
+
+#Calculate Moving Window Step length
+posmo_truth <- posmo_truth |>
+  mutate(
+    step_mean = rowMeans(
+      cbind(
+        sqrt((lag(coords$X, 3) - coords$X)^2 + (lag(coords$Y, 3) - coords$Y)^2),
+        sqrt((lag(coords$X, 2) - coords$X)^2 + (lag(coords$Y, 2) - coords$Y)^2),
+        sqrt((lag(coords$X, 1) - coords$X)^2 + (lag(coords$Y, 1) - coords$Y)^2),
+        sqrt((coords$X - lead(coords$X, 1))^2 + (coords$Y - lead(coords$Y, 1))^2),
+        sqrt((coords$X - lead(coords$X, 2))^2 + (coords$Y - lead(coords$Y, 2))^2),
+        sqrt((coords$X - lead(coords$X, 3))^2 + (coords$Y - lead(coords$Y, 3))^2)
+      )
+    )
+  )
+
+
+#Calculate Moving Window diff_s
+posmo_truth <- posmo_truth |>
+  mutate(diff_s_mean = as.numeric(difftime(lead(datetime,3),lag(datetime,3)))/6)
+
+
+#Calculate Moving Window velocity
+posmo_truth <- posmo_truth |>
+  mutate(velocity_mean = as.numeric(step_mean/diff_s_mean))
+ 
+# Delete Infitinte Values (is there better solution?)
+#posmo_truth$velocity <- posmo_truth$velocity[!is.infinite(posmo_truth$velocity)]
+coords <- data.frame(st_coordinates(posmo_truth), posmo_truth$id)
 ```
 
 ### 1.4.2 Acceleration /Moving Window?
+
+
+```{r Acceleration}
+#Acceleration stepwise
+posmo_truth$acceleration_sw <- posmo_truth$velocity/lag(posmo_truth$diff_s)
+
+# Calculate acceleration using a moving window
+posmo_truth <- posmo_truth |>
+  mutate(
+    acceleration_mean = rowMeans(
+      cbind(
+        lag(posmo_truth$acceleration_sw,3),
+        lag(posmo_truth$acceleration_sw,2),
+        lag(posmo_truth$acceleration_sw,1),
+        posmo_truth$acceleration_sw,
+        lead(posmo_truth$acceleration_sw,1),
+        lead(posmo_truth$acceleration_sw,2),
+        lead(posmo_truth$acceleration_sw,3)
+      )
+    )
+  )
+
+
+```
+
 ### 1.4.3 Sinuosity /Moving Window?
+
+```{r Sinuosity}
+# Calculate Sinuosity using moving step_mean as path length and euclidean distance between
+
+
+posmo_truth <- posmo_truth |>
+  mutate(
+    sinuosity = 
+      ( # Path Length/Direct distance between first and last point
+        sqrt((lag(coords$X, 3) - lag(coords$X, 2))^2 + (lag(coords$Y, 3) - lag(coords$Y, 2))^2) +
+        sqrt((lag(coords$X, 2) - lag(coords$X, 1))^2 + (lag(coords$Y, 2) - lag(coords$Y, 1))^2) +
+        sqrt((lag(coords$X, 1) - coords$X)^2 + (lag(coords$Y, 1) - coords$Y)^2) +
+        sqrt((coords$X - lead(coords$X, 1))^2 + (coords$Y - lead(coords$Y, 1))^2) +
+        sqrt((lead(coords$X, 1) - lead(coords$X, 2))^2 + (lead(coords$Y, 1) - lead(coords$Y, 2))^2) +
+        sqrt((lead(coords$X, 2) - lead(coords$X, 3))^2 + (lead(coords$Y, 2) - lead(coords$Y, 3))^2)
+      ) 
+      / sqrt((lag(coords$X, 3) - lead(coords$X, 3))^2 + (lag(coords$Y, 3) - lead(coords$Y, 3))^2)
+  )
+
+```
+
 ### 1.4.4 Closeness to Traffic Network
 ### 1.4.5 Water Bodies (For boats)
 ### 1.4.6 Slope?
 ### 1.4.7 Average Distance between points in section
 ### FUrther Parameters!
+
+
+## Clean Data
+```{r}
+# Replace NA values with a specified value (e.g., mean, median, or 0)
+posmo_truth[is.na(posmo_truth)] <- 0  # Replace NA with 0
+
+
+```
 
 # 2.PCA?
 
@@ -121,6 +221,11 @@ Boat
 Other
 
 # 4. Cluster
+
+# 5. Random Forest (RF)
+```{r RF}
+```
+
 
 # 5. ANN
 
