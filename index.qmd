@@ -3,8 +3,10 @@ title: The title of your Semesterproject
 subtitle: A subtle subtitle
 author: Cyril Geistlich and Micha Franz
 output: html
+editor: visual
+  markdown: 
+    wrap: 72
 ---
-
 
 <!-- You can add  your R Code with Code chunks-->
 
@@ -24,9 +26,7 @@ output: html
 
 ```
 
-
 ## Abstract
-
 
 This project aims to investigate key factors and features in GPS tracking data to differentiate transportation vehicles. Machine learning is applied to automate transportation mode detection using spatial, temporal, and attribute analysis. Manual verification of results ensures accuracy. The findings contribute to computational movement analysis and automated transportation mode detection.
 
@@ -34,27 +34,28 @@ This project aims to investigate key factors and features in GPS tracking data t
 
 ## Research Question
 
-What are the key factors and features that can be extracted from GPS tracking data to differentiate between different types of transportation modes?
-How can machine learning techniques be applied to GPS tracking data to automate the detection of the mode of transportation and which accuracies can be achieved by different machine learning algorithms?
-
+What are the key factors and features that can be extracted from GPS tracking data to differentiate between different types of transportation modes? How can machine learning techniques be applied to GPS tracking data to automate the detection of the mode of transportation and which accuracies can be achieved by different machine learning algorithms?
 
 ## Material and Methods
 
 <!-- the following is just a placeholder text, remove it!-->
+
 Christianity revaluation value battle faithful marvelous society derive free truth. Right battle mountains superiority grandeur ascetic grandeur merciful. Derive against intentions burying salvation ocean. Right intentions dead victorious ideal spirit evil ultimate joy. Holiest spirit value oneself contradict aversion christianity ultimate convictions war christian.
 
 ## Results
 
 <!-- the following is just a placeholder text, remove it!-->
+
 Philosophy oneself passion play fearful self noble zarathustra deceptions sexuality. Endless ocean of oneself dead ocean. Selfish decrepit.
 
 ## Discussion
 
 <!-- the following is just a placeholder text, remove it!-->
+
 Justice convictions spirit sexuality insofar free marvelous joy. Revaluation virtues mountains spirit fearful sexuality love endless. Society intentions will noble burying aversion moral. Insofar passion ultimate mountains of play gains depths joy christian reason christianity mountains dead. Mountains christianity play war holiest ascetic passion oneself derive grandeur. Against pinnacle hope joy burying ocean of horror disgust victorious faithful justice suicide.
 
-
 ## Code
+
 ```{r}
 library("dplyr")
 library("sf")
@@ -68,17 +69,50 @@ library("zoo")
 library("neuralnet")
 # library("keras")
 # library("tensorflow")
+library("LearnGeom")
 ```
 
+## supporting functions
+
+```{r}
+custom_mapview <- function(sf_object){
+  mapview(sf_object, cex = 4, col.regions = "#700101")
+}
+
+
+point2line <- function(points){
+  geometries <- st_cast(st_geometry(points %>% select(geometry)), "POINT")
+  n <- length(geometries) - 1
+  linestrings <- lapply(X = 1:n, FUN = function(x) {
+
+  pair <- st_combine(c(geometries[x], geometries[x + 1]))
+  line <- st_cast(pair, "LINESTRING")
+  return(line)
+  })
+  
+  multilinetring <- st_multilinestring(do.call("rbind", linestrings))
+  
+  df <- data.frame(linestrings[1])
+  
+  for (i in 2:length(linestrings)){
+    temp <- data.frame(linestrings[i])
+    df <-  rbind(df, temp) 
+  }
+  sf_lines <- df %>% st_as_sf()
+}
+```
 
 # 1. Data Prep
-## 1.1 Read Data
 
+## 1.1 Read Data
 
 ```{r read data}
 #posmo_truth_csv <- read.delim("data/posmo_full.csv",sep=",")
-posmo_micha_truth_csv <- read.delim("data/labelled/posmo_20230502_to_20230613_labelled.csv",sep=",") 
+posmo_micha_truth_csv <- read.delim("data/manually_labelled/posmo_20230502_to_20230613_m.csv",sep=",") 
+posmo_micha_csv <- read.delim("data/posmo_labelled/posmo_20230502_to_20230613_p.csv",sep=",") 
 ```
+
+## 1.2 Clean and preprocess data
 
 ```{r preprocess data}
 
@@ -86,7 +120,7 @@ posmo_micha_truth_csv <- read.delim("data/labelled/posmo_20230502_to_20230613_la
 # posmo_raw <- st_as_sf(posmo_raw,coords=c("lon_x", "lat_y"), crs = 2056)
 #mapview(posmo_truth)
 
-process_posmo_data <- function(posmo_data) {
+process_posmo_data <- function(posmo_data) { # function with preprocessing steps
 
   # Convert to sf object
   posmo_data <- posmo_data %>%
@@ -103,91 +137,53 @@ process_posmo_data <- function(posmo_data) {
   posmo_data <- posmo_data %>%
     mutate(id = row_number())
   
-  # remove duolicate values
+  # remove duplicate time values
   posmo_data <- posmo_data[!duplicated(posmo_data$datetime), ]
+  
+  # remove subsequent duplicate location 
+  posmo_data <- posmo_data %>% 
+    filter(geometry != lead(geometry))
   
   return(posmo_data)
 }
 
-posmo_truth <- process_posmo_data(posmo_truth_csv)
-
-
-
-posmo_truth <- st_as_sf(posmo_truth, coords = c("lon_x", "lat_y"), crs = 4326) |>
-   st_transform(posmo_truth, crs = 2056)
-
-# Remove unwanted columns
-posmo_truth <- posmo_truth[,-c(1,3,4)]
-
-# Fix Timestamp
-posmo_truth$datetime <- ymd_hms(posmo_truth$datetime) + hours(2)
-
-#Ad ID to rows
-posmo_truth <- posmo_truth |>
-  mutate(id = row_number())
-
-
-
-
-
+#posmo_truth <- process_posmo_data(posmo_truth_csv)
 ```
 
-
-```{r}
-
-process_posmo_data <- function(posmo_data) {
-
-  # Convert to sf object
-  posmo_data <- posmo_data %>%
-    st_as_sf(coords = c("lon_x", "lat_y"), crs = 4326) %>%
-    st_transform(crs = 2056)
-  
-  # Remove unwanted columns
-  posmo_data <- posmo_data[, -c(1, 3, 4)]
-  
-  # Fix Timestamp
-  posmo_data$datetime <- ymd_hms(posmo_data$datetime) + hours(2)
-  
-  # Add ID to rows
-  posmo_data <- posmo_data %>%
-    mutate(id = row_number())
-  
-  # remove duolicate values
-  posmo_data <- posmo_data[!duplicated(posmo_data$datetime), ]
-  
-  return(posmo_data)
-}
-
-
-
-# Example usage
+```{r datasets}
 posmo_micha_truth <- process_posmo_data(posmo_micha_truth_csv)
 
+posmo_micha <-  process_posmo_data(posmo_micha_csv)
 
+micha_subset <- posmo_micha_truth %>% filter(datetime < ymd("20230503")) %>% head(60)
 
+working_dataset <- micha_subset
 ```
 
-
-## 1.2 Clean Data (if necessary)?
 ## 1.3 Segmentation?
+
+```{r}
+```
+
 ## 1.4 Calculate Movement Parameters
+
 ### 1.4.1 Speed/ Additional Moving Window Speed?
 
 ```{r Calc Diff_s, steplength, velocity}
 #Create Coord Column
-coords <- data.frame(st_coordinates(posmo_truth), posmo_truth$id)
+coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
 
 #Calculate Time Difference between steps (diff_s), steplenght and velocity. 
-posmo_truth <- posmo_truth |> 
+working_dataset <- working_dataset |> 
   mutate(diff_s = as.numeric(difftime(lead(datetime),datetime))) |>
   mutate(steplength = ((coords$X - lead(coords$X))^2 + (coords$Y - lead(coords$Y))^2)^0.5) |>
   mutate(velocity = as.numeric(steplength/diff_s)) |>
   filter(diff_s != 0)
 
-coords <- data.frame(st_coordinates(posmo_truth), posmo_truth$id)
+coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
 
 #Calculate Moving Window Step length
-posmo_truth <- posmo_truth |>
+working_dataset <- working_dataset |>
   mutate(
     step_mean = rowMeans(
       cbind(
@@ -203,38 +199,39 @@ posmo_truth <- posmo_truth |>
 
 
 #Calculate Moving Window diff_s
-posmo_truth <- posmo_truth |>
+working_dataset <- working_dataset |>
   mutate(diff_s_mean = as.numeric(difftime(lead(datetime,3),lag(datetime,3)))/6)
 
 
 #Calculate Moving Window velocity
-posmo_truth <- posmo_truth |>
+working_dataset <- working_dataset |>
   mutate(velocity_mean = as.numeric(step_mean/diff_s_mean))
  
 # Delete Infitinte Values (is there better solution?)
-#posmo_truth$velocity <- posmo_truth$velocity[!is.infinite(posmo_truth$velocity)]
-coords <- data.frame(st_coordinates(posmo_truth), posmo_truth$id)
+#working_dataset$velocity <- working_dataset$velocity[!is.infinite(working_dataset$velocity)]
+coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
+
+
 ```
 
 ### 1.4.2 Acceleration /Moving Window?
 
-
 ```{r Acceleration}
 #Acceleration stepwise
-posmo_truth$acceleration <- posmo_truth$velocity/lag(posmo_truth$diff_s)
+working_dataset$acceleration <- working_dataset$velocity/lag(working_dataset$diff_s)
 
 # Calculate acceleration using a moving window
-posmo_truth <- posmo_truth |>
+working_dataset <- working_dataset |>
   mutate(
     acceleration_mean = rowMeans(
       cbind(
-        lag(posmo_truth$acceleration,3),
-        lag(posmo_truth$acceleration,2),
-        lag(posmo_truth$acceleration,1),
-        posmo_truth$acceleration,
-        lead(posmo_truth$acceleration,1),
-        lead(posmo_truth$acceleration,2),
-        lead(posmo_truth$acceleration,3)
+        lag(working_dataset$acceleration,3),
+        lag(working_dataset$acceleration,2),
+        lag(working_dataset$acceleration,1),
+        working_dataset$acceleration,
+        lead(working_dataset$acceleration,1),
+        lead(working_dataset$acceleration,2),
+        lead(working_dataset$acceleration,3)
       )
     )
   )
@@ -248,7 +245,7 @@ posmo_truth <- posmo_truth |>
 # Calculate Sinuosity using moving step_mean as path length and euclidean distance between
 
 
-posmo_truth <- posmo_truth |>
+working_dataset <- working_dataset |>
   mutate(
     sinuosity = 
       ( # Path Length/Direct distance between first and last point
@@ -260,80 +257,127 @@ posmo_truth <- posmo_truth |>
         sqrt((lead(coords$X, 2) - lead(coords$X, 3))^2 + (lead(coords$Y, 2) - lead(coords$Y, 3))^2)
       ) 
       / sqrt((lag(coords$X, 3) - lead(coords$X, 3))^2 + (lag(coords$Y, 3) - lead(coords$Y, 3))^2)
-  )
+  ) 
 
 ```
 
-### 1.4.4 Closeness to Traffic Network
-### 1.4.5 Water Bodies (For boats)
-### 1.4.6 Slope?
-### 1.4.7 Average Distance between points in section
-### FUrther Parameters!
+### 1.4.4 Angle
+
+```{r}
+
+getAngle <- function(coords) {
+  angles <- numeric(nrow(coords)) # Initialize angles as a numeric vector
+  angles[1] = NA
+
+  for (i in 2:(nrow(coords) - 1)) {
+    angle <- Angle(
+      c(coords[i - 1, "X"], coords[i - 1, "Y"]),
+      c(coords[i, "X"], coords[i, "Y"]),
+      c(coords[i + 1, "X"], coords[i + 1, "Y"])
+    )
+    angles[i] <- angle # Assign the calculated angle to the corresponding index in angles
+  }
+  angles[nrow(coords)] = NA
+  return(c(angles))
+}
+
+working_dataset$angle <- getAngle(coords)
+```
+
+### 1.4.5 Closeness to Traffic Network
+
+### 1.4.6 Water Bodies (For boats)
+
+### 1.4.7 Slope?
+
+### 1.4.8 Average Distance between points in section
+
+### Further Parameters!
+
+### Tests to identify GPS spoofing (false movement)
+
+```{r}
+working_dataset_line <- point2line(working_dataset)
+
+#working_dataset$error <- working_dataset$sinuosity > 3
+
+mapview(working_dataset, zcol="angle") +
+  mapview(working_dataset_line, color="black")
+
+
+working_dataset[5:7,] %>% st_coordinates()
+working_dataset[5:7,] $id
+
+
+
+
+
+
+# Calculate the angle between the coordinates
+
+
+# Convert the angle from radians to degrees
+angle_degrees <- angle 
+
+# Display the angle in degrees
+print(angle_degrees)
+```
 
 
 ## Clean Data
+
 ```{r}
 # Replace NA values with a specified value (e.g., mean, median, or 0)
-posmo_truth[is.na(posmo_truth)] <- 0  # Replace NA with 0
+working_dataset[is.na(working_dataset)] <- 0  # Replace NA with 0
 
 
-velocity_plot <- ggplot(posmo_truth, aes(id,velocity)) +
+velocity_plot <- ggplot(working_dataset, aes(id,velocity)) +
   geom_point() +
   ylab("velocity [m/s]")
 
-acceleration_plot <- ggplot(posmo_truth, aes(id,acceleration)) +
+acceleration_plot <- ggplot(working_dataset, aes(id,acceleration)) +
   geom_point() +
   ylab("acceleration [m/s2]")
 
-sinuosity_plot <- ggplot(posmo_truth, aes(id,sinuosity)) +
+sinuosity_plot <- ggplot(working_dataset, aes(id,sinuosity)) +
   geom_point()
 
-ggsave("plots/velocity_plot.png", plot = velocity_plot, width = 8, height = 6, dpi = 300)
-ggsave("plots/acceleration_plot.png", plot = acceleration_plot, width = 8, height = 6, dpi = 300)
-ggsave("plots/sinuosity_plot.png", plot = sinuosity_plot, width = 8, height = 6, dpi = 300)
+# ggsave("plots/velocity_plot.png", plot = velocity_plot, width = 8, height = 6, dpi = 300)
+# ggsave("plots/acceleration_plot.png", plot = acceleration_plot, width = 8, height = 6, dpi = 300)
+# ggsave("plots/sinuosity_plot.png", plot = sinuosity_plot, width = 8, height = 6, dpi = 300)
 ```
 
 ```{r}
-posmo_truth <- posmo_truth[posmo_truth$velocity < 250,]
-posmo_truth <- posmo_truth[posmo_truth$sinuosity < 5,]
-posmo_truth <- posmo_truth[posmo_truth$acceleration < 20,]
-posmo_truth <- posmo_truth[posmo_truth$diff_s < 1000,]
+working_dataset <- working_dataset[working_dataset$velocity < 250,]
+working_dataset <- working_dataset[working_dataset$sinuosity < 5,]
+working_dataset <- working_dataset[working_dataset$acceleration < 20,]
+working_dataset <- working_dataset[working_dataset$diff_s < 1000,]
 ```
-
 
 # 2.PCA?
 
-
 # 3. Categories
-Stationary?
-Walk (Running?)
-Bike
-Train
-Tram
-Bus
-Car
-Skateboard
-Scooter
-Boat
-Other
+
+Stationary? Walk (Running?) Bike Train Tram Bus Car Skateboard E-Scooter Boat Other
 
 # 4. Cluster
 
 # 5. Random Forest (RF)
+
 ```{r RF}
 ```
 
-
 # 5. ANN
+
 ```{r Convolutional Neural Network (CNN)}
 # We use a CNN, because it produces good results in pattern recognition
 
 # Remove Points with no transport_mode tag
 
-posmo_truth <- posmo_truth[posmo_truth$transport_mode != "", ]
-posmo_truth <- posmo_truth[posmo_truth$transport_mode != "Other1", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "Other1", ]
 #Remove any columns with strings
-posmo_cnn <- st_drop_geometry(posmo_truth)
+posmo_cnn <- st_drop_geometry(working_dataset)
 posmo_cnn <- posmo_cnn[,-c(1,3,4)]
 
 posmo_cnn$transport_mode[posmo_cnn$transport_mode == 'Bike'] <- '1'
@@ -441,14 +485,15 @@ input_plot
 
 
 ```
+
 ```{r confusion matrix}
 cluster_result <- na.omit(cluster_result)
 (confusion_matrix <- table(cluster_result$transport_mode, cluster_result$clustering.cluster, dnn=c("Predicted, Observed")))
 ```
+
 ```{r Overall Accuracy}
 sum(diag(confusion_matrix))/sum(confusion_matrix)
 ```
-
 
 ```{r CNN Model}
 # set.seed(100)
@@ -483,35 +528,36 @@ sum(diag(confusion_matrix))/sum(confusion_matrix)
 ```
 
 ```{r}
-(unique(posmo_truth$transport_mode))
+(unique(working_dataset$transport_mode))
 
 ```
 
 # 6. Evaluation
 
 # Visualisation
+
 ```{r vis}
-visual <- data.frame(st_coordinates(posmo_truth), posmo_truth$velocity, posmo_truth$acceleration, posmo_truth$sinuosity)
+visual <- data.frame(st_coordinates(working_dataset), working_dataset$velocity, working_dataset$acceleration, working_dataset$sinuosity)
 
 visual|> ggplot() +
-  geom_point(aes(X,Y,color = posmo_truth.velocity))
+  geom_point(aes(X,Y,color = working_dataset.velocity))
 
 visual|> ggplot() +
-  geom_point(aes(X,Y,color = posmo_truth.acceleration))
+  geom_point(aes(X,Y,color = working_dataset.acceleration))
 
 visual|> ggplot() +
-  geom_point(aes(X,Y,color = posmo_truth.sinuosity))
+  geom_point(aes(X,Y,color = working_dataset.sinuosity))
 
-ggplot(posmo_truth, aes(id,sinuosity)) +
+ggplot(working_dataset, aes(id,sinuosity)) +
   geom_point()
 
 cluster_result <- mutate(cluster_result, id = row_number())
-posmo_truth <- mutate(posmo_truth, id = row_number())
+working_dataset <- mutate(working_dataset, id = row_number())
 
-cluster_join <- left_join(cluster_result, posmo_truth, by = "id" )
+cluster_join <- left_join(cluster_result, working_dataset, by = "id" )
 
 cluster_join$correct <- cluster_join$clustering.cluster == cluster_join$transport_mode.x
-cluster_join <- data.frame(cluster_join,st_coordinates(posmo_truth))
+cluster_join <- data.frame(cluster_join,st_coordinates(working_dataset))
 map_plot <- ggplot(cluster_join) +
   geom_point(aes(X, Y, colour = correct), size = 1, alpha = 0.2)
 
@@ -522,4 +568,3 @@ ggsave("plots/truefalse.png", plot = truefalse, width = 8, height = 6, dpi = 300
 ggsave("plots/map_plot.png", plot = map_plot, width = 8, height = 6, dpi = 300)
   
 ```
-
