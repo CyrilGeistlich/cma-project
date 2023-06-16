@@ -140,7 +140,7 @@ process_posmo_data <- function(posmo_data) { # function with preprocessing steps
   # remove duplicate time values
   posmo_data <- posmo_data[!duplicated(posmo_data$datetime), ]
   
-  # remove subsequent duplicate location 
+  # remove subsequent duplicate location (person wasn't moving)
   posmo_data <- posmo_data %>% 
     filter(geometry != lead(geometry))
   
