@@ -106,10 +106,19 @@ point2line <- function(points){
 
 ## 1.1 Read Data
 
-```{r read data}
+```{r read tracking data}
 #posmo_truth_csv <- read.delim("data/posmo_full.csv",sep=",")
 posmo_micha_truth_csv <- read.delim("data/manually_labelled/posmo_20230502_to_20230613_m.csv",sep=",") 
 posmo_micha_csv <- read.delim("data/posmo_labelled/posmo_20230502_to_20230613_p.csv",sep=",") 
+```
+
+```{r read context data}
+
+zvv_sbahn <- st_read("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_S_BAHN_LINIEN_L") 
+
+zvv_tram_bus <- st_read("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_LINIEN_GEN_L") 
+
+seen <- read_sf("data/gewaesser.shp")
 ```
 
 ## 1.2 Clean and preprocess data
@@ -155,7 +164,7 @@ posmo_micha_truth <- process_posmo_data(posmo_micha_truth_csv)
 
 posmo_micha <-  process_posmo_data(posmo_micha_csv)
 
-micha_subset <- posmo_micha_truth %>% filter(datetime < ymd("20230503")) %>% head(60)
+micha_subset <- posmo_micha_truth %>% filter(datetime < ymd("20230503"))
 
 working_dataset <- micha_subset
 ```
@@ -267,21 +276,27 @@ working_dataset <- working_dataset |>
 
 getAngle <- function(coords) {
   angles <- numeric(nrow(coords)) # Initialize angles as a numeric vector
-  angles[1] = NA
+  angles[1] = NA # first point can't have an angle
 
-  for (i in 2:(nrow(coords) - 1)) {
-    angle <- Angle(
+  for (i in 2:(nrow(coords) - 1)) { # calculate the angle for 3 consecutive points, similar to lag/lead
+    angle <- Angle( #function from library LearnGeom
       c(coords[i - 1, "X"], coords[i - 1, "Y"]),
       c(coords[i, "X"], coords[i, "Y"]),
       c(coords[i + 1, "X"], coords[i + 1, "Y"])
     )
     angles[i] <- angle # Assign the calculated angle to the corresponding index in angles
   }
-  angles[nrow(coords)] = NA
+  angles[nrow(coords)] = NA # last point cant have an angle
   return(c(angles))
 }
 
+
+
 working_dataset$angle <- getAngle(coords)
+working_dataset <- working_dataset %>% filter(angle > 60)
+coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
+working_dataset$angle <- getAngle(coords)
+working_dataset <- working_dataset %>% filter(angle > 60)
 ```
 
 ### 1.4.5 Closeness to Traffic Network
@@ -299,28 +314,12 @@ working_dataset$angle <- getAngle(coords)
 ```{r}
 working_dataset_line <- point2line(working_dataset)
 
-#working_dataset$error <- working_dataset$sinuosity > 3
+working_dataset_line_cleaned <- point2line(working_dataset)
+  
+mapview(working_dataset, col.regions="black") +
+  mapview(working_dataset_line, color="#901010", lwd=2) +
+  mapview(working_dataset_line_cleaned, color="green", lwd=2)
 
-mapview(working_dataset, zcol="angle") +
-  mapview(working_dataset_line, color="black")
-
-
-working_dataset[5:7,] %>% st_coordinates()
-working_dataset[5:7,] $id
-
-
-
-
-
-
-# Calculate the angle between the coordinates
-
-
-# Convert the angle from radians to degrees
-angle_degrees <- angle 
-
-# Display the angle in degrees
-print(angle_degrees)
 ```
 
 
@@ -345,6 +344,11 @@ sinuosity_plot <- ggplot(working_dataset, aes(id,sinuosity)) +
 # ggsave("plots/velocity_plot.png", plot = velocity_plot, width = 8, height = 6, dpi = 300)
 # ggsave("plots/acceleration_plot.png", plot = acceleration_plot, width = 8, height = 6, dpi = 300)
 # ggsave("plots/sinuosity_plot.png", plot = sinuosity_plot, width = 8, height = 6, dpi = 300)
+```
+
+
+```{r}
+working_dataset_copy <- working_dataset
 ```
 
 ```{r}
@@ -376,7 +380,8 @@ Stationary? Walk (Running?) Bike Train Tram Bus Car Skateboard E-Scooter Boat Ot
 
 working_dataset <- working_dataset[working_dataset$transport_mode != "", ]
 working_dataset <- working_dataset[working_dataset$transport_mode != "Other1", ]
-#Remove any columns with strings
+
+# Remove any columns with strings
 posmo_cnn <- st_drop_geometry(working_dataset)
 posmo_cnn <- posmo_cnn[,-c(1,3,4)]
 
@@ -398,7 +403,7 @@ posmo_clust <- scale(posmo_clust)
 
 
 # Perform k-means clustering
-num_clusters <- 6  # Number of clusters
+num_clusters <- 3  # Number of clusters
 clustering <- kmeans(posmo_clust, centers = num_clusters, algorithm = "Forgy")
 
 # Get the cluster assignments
@@ -412,10 +417,11 @@ cluster_result$transport_mode[cluster_result$transport_mode == '4'] <- 'Train'
 cluster_result$transport_mode[cluster_result$transport_mode == '5'] <- 'Tram'
 cluster_result$transport_mode[cluster_result$transport_mode == '6'] <- 'Walk'
 
+working_dataset$c_transport_mode <- cluster_result$clustering.cluster
 
 
-
-
+mapview(working_dataset, zcol="c_transport_mode") +
+  mapview(working_dataset, zcol = "transport_mode")
 
 # cluster$labelClust[cluster$labelClust == '1'] <- 'Bike'
 # cluster$labelClust[cluster$labelClust == '2'] <- 'Bus'
@@ -482,8 +488,6 @@ ggsave("plots/input_plot.png", plot = input_plot, width = 8, height = 6, dpi = 3
 ggsave("plots/output_plot.png", plot = output_plot, width = 8, height = 6, dpi = 300)
 output_plot
 input_plot
-
-
 ```
 
 ```{r confusion matrix}
