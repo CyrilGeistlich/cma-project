@@ -56,7 +56,7 @@ Justice convictions spirit sexuality insofar free marvelous joy. Revaluation vir
 
 ## Code
 
-```{r}
+```{r, warning = F}
 library("dplyr")
 library("sf")
 library("readr") 
@@ -64,12 +64,14 @@ library("ggplot2") # to visualize data
 library("mapview")
 library("lubridate")
 library("zoo") 
-# library("caret") # Classification package
+library("caret") # Classification package
 #CNN
 library("neuralnet")
+library(mlbench)
 # library("keras")
 # library("tensorflow")
 library("LearnGeom")
+library(randomForest)
 ```
 
 ## supporting functions
@@ -114,11 +116,11 @@ posmo_micha_csv <- read.delim("data/posmo_labelled/posmo_20230502_to_20230613_p.
 
 ```{r read context data}
 
-zvv_sbahn <- st_read("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_S_BAHN_LINIEN_L") 
+#zvv_sbahn <- st_read("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_S_BAHN_LINIEN_L") 
 
-zvv_tram_bus <- st_read("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_LINIEN_GEN_L") 
+#zvv_tram_bus <- st_read("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_LINIEN_GEN_L") 
 
-seen <- read_sf("data/gewaesser.shp")
+#seen <- read_sf("data/gewaesser.shp")
 ```
 
 ## 1.2 Clean and preprocess data
@@ -164,7 +166,8 @@ posmo_micha_truth <- process_posmo_data(posmo_micha_truth_csv)
 
 posmo_micha <-  process_posmo_data(posmo_micha_csv)
 
-micha_subset <- posmo_micha_truth %>% filter(datetime < ymd("20230503"))
+micha_subset <- posmo_micha_truth 
+#%>% filter(datetime < ymd("20230503"))
 
 working_dataset <- micha_subset
 ```
@@ -322,7 +325,6 @@ mapview(working_dataset, col.regions="black") +
 
 ```
 
-
 ## Clean Data
 
 ```{r}
@@ -346,16 +348,8 @@ sinuosity_plot <- ggplot(working_dataset, aes(id,sinuosity)) +
 # ggsave("plots/sinuosity_plot.png", plot = sinuosity_plot, width = 8, height = 6, dpi = 300)
 ```
 
-
 ```{r}
 working_dataset_copy <- working_dataset
-```
-
-```{r}
-working_dataset <- working_dataset[working_dataset$velocity < 250,]
-working_dataset <- working_dataset[working_dataset$sinuosity < 5,]
-working_dataset <- working_dataset[working_dataset$acceleration < 20,]
-working_dataset <- working_dataset[working_dataset$diff_s < 1000,]
 ```
 
 # 2.PCA?
@@ -364,211 +358,4 @@ working_dataset <- working_dataset[working_dataset$diff_s < 1000,]
 
 Stationary? Walk (Running?) Bike Train Tram Bus Car Skateboard E-Scooter Boat Other
 
-# 4. Cluster
 
-# 5. Random Forest (RF)
-
-```{r RF}
-```
-
-# 5. ANN
-
-```{r Convolutional Neural Network (CNN)}
-# We use a CNN, because it produces good results in pattern recognition
-
-# Remove Points with no transport_mode tag
-
-working_dataset <- working_dataset[working_dataset$transport_mode != "", ]
-working_dataset <- working_dataset[working_dataset$transport_mode != "Other1", ]
-
-# Remove any columns with strings
-posmo_cnn <- st_drop_geometry(working_dataset)
-posmo_cnn <- posmo_cnn[,-c(1,3,4)]
-
-posmo_cnn$transport_mode[posmo_cnn$transport_mode == 'Bike'] <- '1'
-posmo_cnn$transport_mode[posmo_cnn$transport_mode == 'Bus'] <- '2'
-posmo_cnn$transport_mode[posmo_cnn$transport_mode == 'Car'] <- '3'
-posmo_cnn$transport_mode[posmo_cnn$transport_mode == 'Train'] <- '4'
-posmo_cnn$transport_mode[posmo_cnn$transport_mode == 'Tram'] <- '5'
-posmo_cnn$transport_mode[posmo_cnn$transport_mode == 'Walk'] <- '6'
-posmo_cnn$transport_mode <- as.numeric(posmo_cnn$transport_mode, na.omit = T)
-
-
-```
-
-```{r}
-set.seed(100)
-posmo_clust <- posmo_cnn[,c(3,7)]
-posmo_clust <- scale(posmo_clust)
-
-
-# Perform k-means clustering
-num_clusters <- 3  # Number of clusters
-clustering <- kmeans(posmo_clust, centers = num_clusters, algorithm = "Forgy")
-
-# Get the cluster assignments
-cluster_result <- data.frame(posmo_cnn[1], clustering$cluster, iter.max = 50)
-
-
-cluster_result$transport_mode[cluster_result$transport_mode == '1'] <- 'Bike'
-cluster_result$transport_mode[cluster_result$transport_mode == '2'] <- 'Bus'
-cluster_result$transport_mode[cluster_result$transport_mode == '3'] <- 'Car'
-cluster_result$transport_mode[cluster_result$transport_mode == '4'] <- 'Train'
-cluster_result$transport_mode[cluster_result$transport_mode == '5'] <- 'Tram'
-cluster_result$transport_mode[cluster_result$transport_mode == '6'] <- 'Walk'
-
-working_dataset$c_transport_mode <- cluster_result$clustering.cluster
-
-
-mapview(working_dataset, zcol="c_transport_mode") +
-  mapview(working_dataset, zcol = "transport_mode")
-
-# cluster$labelClust[cluster$labelClust == '1'] <- 'Bike'
-# cluster$labelClust[cluster$labelClust == '2'] <- 'Bus'
-# cluster$labelClust[cluster$labelClust == '3'] <- 'Car'
-# cluster$labelClust[cluster$labelClust == '4'] <- 'Train'
-# cluster$labelClust[cluster$labelClust == '5'] <- 'Tram'
-# cluster$labelClust[cluster$labelClust == '6'] <- 'Walk'
-# 
-# cluster$transport_mode[cluster$transport_mode == '1'] <- 'Bike'
-# cluster$transport_mode[cluster$transport_mode == '2'] <- 'Bus'
-# cluster$transport_mode[cluster$transport_mode == '3'] <- 'Car'
-# cluster$transport_mode[cluster$transport_mode == '4'] <- 'Train'
-# cluster$transport_mode[cluster$transport_mode == '5'] <- 'Tram'
-# cluster$transport_mode[cluster$transport_mode == '6'] <- 'Walk'
-
-# posmo_clust_p$transport_mode[posmo_clust_p$transport_mode == '1'] <- 'Bike'
-# posmo_clust_p$transport_mode[posmo_clust_p$transport_mode == '2'] <- 'Bus'
-# posmo_clust_p$transport_mode[posmo_clust_p$transport_mode == '3'] <- 'Car'
-# posmo_clust_p$transport_mode[posmo_clust_p$transport_mode == '4'] <- 'Train'
-# posmo_clust_p$transport_mode[posmo_clust_p$transport_mode == '5'] <- 'Tram'
-# posmo_clust_p$transport_mode[posmo_clust_p$transport_mode == '6'] <- 'Walk'
-
-
-```
-
-```{r}
-# cluster <- cluster_result |>
-#   group_by(clustering.cluster)
-# 
-# #Add count n
-# cluster <- cluster |>
-#   group_by(clustering.cluster, transport_mode)|>
-#   tally()
-# 
-# cluster$labelClust <- NA
-# 
-# for (i in 1:6){
-#   cluster_temp <- cluster |> filter(clustering.cluster == i)
-#   label <- cluster_temp$transport_mode[which.max(cluster_temp$n)]
-#   print(label)
-#   cluster$labelClust[cluster_temp$transport_mode == i] <- label
-# }
-```
-
-```{r}
-# Map Cluster to Transport Mode
-cluster_result$clustering.cluster[cluster_result$clustering.cluster == '1'] <- 'Bike'
-cluster_result$clustering.cluster[cluster_result$clustering.cluster == '2'] <- 'Car'
-cluster_result$clustering.cluster[cluster_result$clustering.cluster == '3'] <- 'Train'
-cluster_result$clustering.cluster[cluster_result$clustering.cluster == '4'] <- 'Bus'
-cluster_result$clustering.cluster[cluster_result$clustering.cluster == '5'] <- 'Walk'
-cluster_result$clustering.cluster[cluster_result$clustering.cluster == '6'] <- 'Tram'
-
-input_plot <- ggplot(cluster_result,aes(transport_mode)) + 
-  geom_bar(color = "gray") +
-  labs(x = "Output Variable", y = "Frequency", title = "Histogram of Input Variables")
-
-# Print the cluster assignments
-output_plot <- ggplot(cluster_result) + 
-  geom_bar(aes(clustering.cluster),color = "gray") +
-  labs(x = "Output Variable", y = "Frequency", title = "Histogram of Cluster Result")
-
-ggsave("plots/input_plot.png", plot = input_plot, width = 8, height = 6, dpi = 300)
-ggsave("plots/output_plot.png", plot = output_plot, width = 8, height = 6, dpi = 300)
-output_plot
-input_plot
-```
-
-```{r confusion matrix}
-cluster_result <- na.omit(cluster_result)
-(confusion_matrix <- table(cluster_result$transport_mode, cluster_result$clustering.cluster, dnn=c("Predicted, Observed")))
-```
-
-```{r Overall Accuracy}
-sum(diag(confusion_matrix))/sum(confusion_matrix)
-```
-
-```{r CNN Model}
-# set.seed(100)
-# # Create Training and Test data set
-# data_rows <- floor(0.80*nrow(posmo_cnn))
-# train_indices <- sample(c(1:nrow(posmo_cnn)), data_rows)
-# train_data <- posmo_cnn[train_indices,]
-# test_data <- posmo_cnn[-train_indices,]
-# 
-# model <- neuralnet((transport_mode == 1) + (transport_mode == 2) + (transport_mode == 3) + 
-#                      (transport_mode == 4) + (transport_mode == 5) + (transport_mode == 6) ~ velocity + sinuosity,
-#                   data = train_data,
-#                   hidden = c(3,2),
-#                   lifesign.step = 1000,
-#                   linear.output = T)
-# 
-# 
-```
-
-```{r prediction}
-
-# pred <- predict(model, test_data, rep = 1)
-# 
-# labels <- unique(posmo_cnn$transport_mode)
-# prediction_label <- data.frame(max.col(pred)) |>
-#   mutate(pred = labels[max.col.pred.]) |>
-#   select(2) |>
-#   unlist()
-# 
-# table(test_data$transport_mode, prediction_label)
-
-```
-
-```{r}
-(unique(working_dataset$transport_mode))
-
-```
-
-# 6. Evaluation
-
-# Visualisation
-
-```{r vis}
-visual <- data.frame(st_coordinates(working_dataset), working_dataset$velocity, working_dataset$acceleration, working_dataset$sinuosity)
-
-visual|> ggplot() +
-  geom_point(aes(X,Y,color = working_dataset.velocity))
-
-visual|> ggplot() +
-  geom_point(aes(X,Y,color = working_dataset.acceleration))
-
-visual|> ggplot() +
-  geom_point(aes(X,Y,color = working_dataset.sinuosity))
-
-ggplot(working_dataset, aes(id,sinuosity)) +
-  geom_point()
-
-cluster_result <- mutate(cluster_result, id = row_number())
-working_dataset <- mutate(working_dataset, id = row_number())
-
-cluster_join <- left_join(cluster_result, working_dataset, by = "id" )
-
-cluster_join$correct <- cluster_join$clustering.cluster == cluster_join$transport_mode.x
-cluster_join <- data.frame(cluster_join,st_coordinates(working_dataset))
-map_plot <- ggplot(cluster_join) +
-  geom_point(aes(X, Y, colour = correct), size = 1, alpha = 0.2)
-
-truefalse <- ggplot(cluster_join)+
-  geom_bar(aes(correct, fill = correct))
-
-ggsave("plots/truefalse.png", plot = truefalse, width = 8, height = 6, dpi = 300)
-ggsave("plots/map_plot.png", plot = map_plot, width = 8, height = 6, dpi = 300)
-  
-```
