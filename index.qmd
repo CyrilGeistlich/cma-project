@@ -81,6 +81,7 @@ library("LearnGeom") # to calculate angle
 library("randomForest")
 library("geosphere") # to calculate distances
 library("RColorBrewer") # to create custom color palettes
+library("ggcorrplot")
 ```
 
 ## supporting functions
@@ -177,7 +178,7 @@ posmo_micha <-  process_posmo_data(posmo_micha_csv)
 ```
 
 ```{r working datasets}
-micha_subset <- posmo_micha_truth #%>% filter(datetime < ymd("20230506") & datetime > ymd("20230501"))
+micha_subset <- posmo_micha_truth %>% filter(datetime < ymd("20230506") & datetime > ymd("20230501"))
 
 working_dataset <- micha_subset
 ```
@@ -401,14 +402,6 @@ working_dataset <- working_dataset |>
 
 ### Further Parameters!
 
-### Tests to identify GPS errors
-
-```{r}
-
-
-```
-
-
 
 ## Clean Data
 
@@ -451,6 +444,8 @@ corr_matrix <- cor(standardized)
 ggcorrplot(corr_matrix)
 
 data_pca <- princomp(corr_matrix)
+
+test <- data_pca$loadings
 
 scores <- as.data.frame(data_pca$scores)
 ```
