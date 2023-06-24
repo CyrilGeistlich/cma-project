@@ -40,11 +40,11 @@ What are the key factors and features that can be extracted from GPS tracking da
 
 <!-- the following is just a placeholder text, remove it!-->
 
-### Removing false movement
+### Removing false movement and static points
 
-When tracking a person throughout the day using GPS data, there are instances where the person appears to be stationary, such as when in an office or at a university. However, due to GPS inaccuracies, these stationary points may not appear at the exact same location and can exhibit erratic movement patterns. The accuracy of GPS signals is often compromised in dense buildings, amplifying this phenomenon. As a result, parameters like velocity and step length can show values that are typically associated with other categories.
+When tracking a person throughout the day using GPS data, there are instances where the person appears to be stationary, such as when in an office or at a university. However, due to GPS inaccuracies, these stationary points may not appear at the exact same location and can exhibit erratic movement patterns. The accuracy of GPS signals is often compromised in dense buildings, amplifying this phenomenon. As a result, parameters like velocity and step length can show values that are typically associated with other categories. To address this issue, two approaches have been employed. 
 
-To address this issue, two approaches have been employed. The first approach involves analyzing the angles between consecutive points. Typically, these angles are significantly smaller for stationary points compared to other movements. By visually determining a threshold angle (X), the dataset is filtered to remove all data points with angles smaller than X. This process needs to be repeated iteratively until no angles below the threshold remain, as the removal of data points alters the angles between the remaining points.
+The first approach involves analyzing the angles between consecutive points. Typically, these angles are significantly smaller for stationary points compared to other movements. By visually determining a threshold angle (X), the dataset is filtered to remove all data points with angles smaller than X. This process needs to be repeated iteratively until no angles below the threshold remain, as the removal of data points alters the angles between the remaining points.
 
 The second approach considers the distance between the current point and a set number (X) of preceding and consecutive points. A point is deemed static if the maximum distance between that point and any of the X preceding or consecutive points exceeds a predefined threshold (X). However, this approach may unintentionally remove non-static data points, particularly when a person is walking slowly and numerous data points are recorded within a small distance. Adjusting the distance threshold or the number of preceding and consecutive points can mitigate this issue, but it requires striking a balance between filtering out false movements and retaining genuine data.
 
@@ -68,20 +68,19 @@ Justice convictions spirit sexuality insofar free marvelous joy. Revaluation vir
 library("dplyr")
 library("sf")
 library("readr") 
-library("ggplot2") # to visualize data
+library("ggplot2")
 library("mapview")
 library("lubridate")
 library("zoo") 
-library("caret") # Classification package
-#CNN
+library("caret")
 library("neuralnet")
 library("mlbench")
 # library("keras")
 # library("tensorflow")
-library("LearnGeom")
+library("LearnGeom") # to calculate angle
 library("randomForest")
-library("geosphere")
-library("RColorBrewer")
+library("geosphere") # to calculate distances
+library("RColorBrewer") # to create custom color palettes
 ```
 
 ## supporting functions
@@ -91,7 +90,7 @@ custom_mapview <- function(sf_object){
   mapview(sf_object, cex = 4, col.regions = "#700101")
 }
 
-
+# creates lines out of points for visualisation purposes
 point2line <- function(points){
   geometries <- st_cast(st_geometry(points %>% select(geometry)), "POINT")
   n <- length(geometries) - 1
@@ -111,6 +110,10 @@ point2line <- function(points){
     df <-  rbind(df, temp) 
   }
   sf_lines <- df %>% st_as_sf()
+}
+
+un_col <- function(df){
+  return(length(unique(df)))
 }
 ```
 
@@ -133,7 +136,7 @@ posmo_micha_csv <- read.delim("data/posmo_labelled/posmo_20230502_to_20230613_p.
 #seen <- read_sf("data/gewaesser.shp")
 ```
 
-## 1.2 Clean and preprocess data
+## 1.2.1 Clean and preprocess data
 
 ```{r preprocess data}
 
@@ -170,14 +173,121 @@ process_posmo_data <- function(posmo_data) { # function with preprocessing steps
 
 posmo_micha_truth <- process_posmo_data(posmo_micha_truth_csv)
 
-posmo_micha <-  process_posmo_data(posmo_micha_csv))
+posmo_micha <-  process_posmo_data(posmo_micha_csv)
 ```
 
 ```{r working datasets}
-micha_subset <- posmo_micha_truth %>% filter(datetime < ymd("20230507") & datetime > ymd("20230506"))
+micha_subset <- posmo_micha_truth #%>% filter(datetime < ymd("20230506") & datetime > ymd("20230501"))
 
 working_dataset <- micha_subset
 ```
+
+
+### 1.2.2 Remove static data points
+```{r function to filter static points using moving distance}
+filterStaticByDistance <- function(data, threshold_distance, consecutive_points) {
+  require(geosphere)
+  
+  # transform to WGS84, necessary to calculate distance using geosphere
+  data <- data %>% st_transform(4326)
+  
+  # Extract coordinates from the geometry
+  coords <- data.frame(st_coordinates(data))
+  data$longitude <- coords$X
+  data$latitude <- coords$Y
+  
+  # Calculate distances to preceding and consecutive points
+  distances <- numeric(nrow(data))
+  for (i in (consecutive_points + 1):(nrow(data) - consecutive_points)) {
+    next_points <- coords[(i + 1):(i + consecutive_points), ]
+    prev_points <- coords[(i - 1):(i - consecutive_points), ]
+    all_points <- rbind(next_points, prev_points)
+    distances[i] <- max(geosphere::distGeo(coords[i, ], all_points))
+  }
+  
+  # Filter out points where the maximum distance exceeds the threshold
+  filtered_data <- data[distances >= threshold_distance | distances == 0, ] # keep first/last values which are 0
+  
+  # Transform back to LV95
+  filtered_data <- filtered_data %>% st_transform(2056)
+  
+  return(list(filtered_data = filtered_data, distances = distances)) # distances are just needed for testing thresholds
+}
+```
+
+
+```{r Function to calculate angle }
+getAngle <- function(coords) {
+  angles <- numeric(nrow(coords)) # Initialize angles as a numeric vector
+  angles[1] = NA # first point can't have an angle
+
+  for (i in 2:(nrow(coords) - 1)) { # calculate the angle for 3 consecutive points, similar to lag/lead
+    angle <- Angle( #function from library LearnGeom
+      c(coords[i - 1, "X"], coords[i - 1, "Y"]),
+      c(coords[i, "X"], coords[i, "Y"]),
+      c(coords[i + 1, "X"], coords[i + 1, "Y"])
+    )
+    angles[i] <- angle # Assign the calculated angle to the corresponding index in angles
+  }
+  angles[nrow(coords)] = NA # last point cant have an angle
+  return(c(angles))
+}
+```
+
+
+```{r function to remove static points by angle}
+filterStaticByAngle <- function(working_dataset, angleTreshold){
+  coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)  
+  working_dataset$angle <- getAngle(coords)
+  min_angle <- min(working_dataset$angle, na.rm = T)
+
+
+  while (min_angle <= angleTreshold) { # iteratively filter out tight angles until none smaller 60 are left
+    working_dataset <- working_dataset %>% filter(is.na(angle) | angle > angleTreshold) # exclude first and last value (=NA)
+    coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
+    working_dataset$angle <- getAngle(coords)
+    min_angle <- min(working_dataset$angle, na.rm = T)
+  }
+  return(working_dataset)
+}
+```
+
+
+
+```{r Actual removal of static points}
+result <- filterStaticByDistance(working_dataset, threshold_distance = 60, consecutive_points = 5)
+
+filteredByDistance <- result$filtered_data
+working_dataset$distances <- result$distances # just for testing threshold values
+filteredByAngle <- filterStaticByAngle(working_dataset, 60)
+filtertedByDistance_and_Angle <- filterStaticByAngle(filteredByDistance, 60)
+```
+
+```{r Visualistion of angle removal}
+filtered_data_line <- point2line(filtertedByDistance_and_Angle)
+filtered_angle_line <- point2line(filteredByAngle)
+unfiltered_data_line <- point2line(working_dataset)
+
+pal_blue <- colorRampPalette(c("cyan", "blue"))
+pal_orng <- colorRampPalette(c("yellow", "red"))
+
+
+mapview(working_dataset, alpha.regions=1.0, col.regions = "#901010") +
+  mapview(unfiltered_data_line, color="#901010", lwd=2) +
+  mapview(filtertedByDistance_and_Angle, alpha.regions=1.0, col.regions="#008940") +
+  mapview(filtered_data_line, color="#008940", lwd=2) 
+
+
+mapview(working_dataset, alpha.regions=1.0, col.regions = "#901010", cex=4) +
+  mapview(unfiltered_data_line, color="#901010", lwd=2) +
+  mapview(filteredByAngle, alpha.regions=1.0, col.regions="orange", cex=4) +
+  mapview(filtered_angle_line, color="orange", lwd=2) 
+
+mapview(filtered_data_line, color="#008940", lwd=2) +
+  mapview(unfiltered_data_line, color="#901010", lwd=2)
+  
+```
+
 
 ## 1.3 Segmentation?
 
@@ -275,117 +385,11 @@ working_dataset <- working_dataset |>
       / sqrt((lag(coords$X, 3) - lead(coords$X, 3))^2 + (lag(coords$Y, 3) - lead(coords$Y, 3))^2)
   ) 
 
-```
-
-### 1.4.4 Angle
-
-```{r Angle}
-getAngle <- function(coords) {
-  angles <- numeric(nrow(coords)) # Initialize angles as a numeric vector
-  angles[1] = NA # first point can't have an angle
-
-  for (i in 2:(nrow(coords) - 1)) { # calculate the angle for 3 consecutive points, similar to lag/lead
-    angle <- Angle( #function from library LearnGeom
-      c(coords[i - 1, "X"], coords[i - 1, "Y"]),
-      c(coords[i, "X"], coords[i, "Y"]),
-      c(coords[i + 1, "X"], coords[i + 1, "Y"])
-    )
-    angles[i] <- angle # Assign the calculated angle to the corresponding index in angles
-  }
-  angles[nrow(coords)] = NA # last point cant have an angle
-  return(c(angles))
-}
-
-#working_dataset <- working_dataset_pre_cleaned
-
-filterStaticByAngle <- function(working_dataset, angleTreshold){
-  coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)  
-  working_dataset$angle <- getAngle(coords)
-  min_angle <- min(working_dataset$angle, na.rm = T)
-
-
-  while (min_angle <= angleTreshold) { # iteratively filter out tight angles until none smaller 60 are left
-    working_dataset <- working_dataset %>% filter(is.na(angle) | angle > angleTreshold) # exclude first and last value (=NA)
-    coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
-    working_dataset$angle <- getAngle(coords)
-    min_angle <- min(working_dataset$angle, na.rm = T)
-  }
-  return(working_dataset)
-}
-
-working_dataset_static <- working_dataset
-working_dataset <- filterStaticByAngle(working_dataset, 60)
 
 ```
 
 
 
-```{r}
-working_dataset_line <- point2line(working_dataset_static)
-
-working_dataset_line_cleaned <- point2line(working_dataset)
-  
-mapview(working_dataset, zcol="angle", alpha.regions=1.0) +
-  mapview(working_dataset_line, color="#901010", lwd=2) +
-  mapview(working_dataset_line_cleaned, color="green", lwd=2) +
-  mapview(working_dataset_pre_cleaned, zcol="angle")
-```
-
-```{r filter static points using static points}
-filter_staying_points <- function(data, threshold_distance, consecutive_points) {
-  require(geosphere)
-  
-  # transform to WGS84
-  data <- data %>% st_transform(4326)
-  
-  # Extract longitude and latitude from the geometry attribute
-  coords <- data.frame(st_coordinates(data))
-  data$longitude <- coords$X
-  data$latitude <- coords$Y
-  
-  # Calculate distances to the next ten points
-  distances <- numeric(nrow(data))
-  for (i in (consecutive_points + 1):(nrow(data) - consecutive_points)) {
-    next_points <- coords[(i + 1):(i + consecutive_points), ]
-    prev_points <- coords[(i - 1):(i - consecutive_points), ]
-    all_points <- rbind(next_points, prev_points)
-    distances[i] <- max(geosphere::distGeo(coords[i, ], all_points))
-  }
-  
-  # Filter out points where the maximum distance exceeds the threshold
-  filtered_data <- data[distances >= threshold_distance | distances == 0, ] # keep first/last values which are 0
-  
-  # Transform back to LV95
-  filtered_data <- filtered_data %>% st_transform(2056)
-  
-  return(list(filtered_data = filtered_data, distances = distances)) # distances just needed for testing thresholds
-}
-
-```
-
-```{r}
-result <- filter_staying_points(working_dataset, threshold_distance = 60, consecutive_points = 5)
-filtered_data <- result$filtered_data
-distances <- result$distances
-working_dataset$distances <- distances
-
-filtered_data_line <- point2line(filtered_data)
-
-color_palette <- colorRampPalette(c("cyan", "blue"))
-color_palette2 <- colorRampPalette(c("yellow", "red"))
-n_values <- 
-
-mapview(working_dataset, zcol="distances", alpha.regions=1.0, col.regions = color_palette2(length(unique(working_dataset$distances)))) +
-  mapview(filtered_data, zcol="distances", alpha.regions=1.0, col.regions = color_palette(length(unique(filtered_data$distances)))) +
-  mapview(filtered_data_line, color="#901010", lwd=2) 
-  
-```
-
-
-```{r filter static points using angle}
-
-
-```
 
 ### 1.4.5 Closeness to Traffic Network
 
