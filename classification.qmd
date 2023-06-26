@@ -27,12 +27,15 @@ working_dataset <- working_dataset[working_dataset$sinuosity < 5,]
 working_dataset <- working_dataset[working_dataset$acceleration < 20,]
 working_dataset <- working_dataset[working_dataset$diff_s < 1000,]
 
-# Filter unwanted categories
+# Filter unwanted categories, such which score low accuracy mainly
+# When nothin is filtere accuracy is 0.72
 working_dataset <- working_dataset[working_dataset$transport_mode != "", ]
 working_dataset <- working_dataset[working_dataset$transport_mode != "Other1", ]
-# working_dataset <- working_dataset[working_dataset$transport_mode != "Funicular", ]
-# working_dataset <- working_dataset[working_dataset$transport_mode != "E_Kick_Scooter", ]
-# working_dataset <- working_dataset[working_dataset$transport_mode != "Run", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "Funicular", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "E_Kick_Scooter", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "Run", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "Boat", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "Skateboard", ]
 
 # working_dataset <- working_dataset[,-c(1)]
 
@@ -124,11 +127,25 @@ model.final.confusion <- confusionMatrix(model.final, as.factor(working_dataset$
 (model.final.table <- model.final.confusion[[2]])
 
 working_dataset_result <- data.frame(working_dataset, model.final)
-
-
-
+working_dataset_result <- left_join(working_dataset_result, working_dataset_copy, 
+                                    by = c("transport_mode","diff_s","diff_s_mean","angle","sinuosity","steplength","step_mean","velocity", "acceleration","acceleration_mean","velocity_mean"))
 
 ```
+```{r}
+working_dataset_result <- working_dataset_result %>%
+    st_as_sf(coords = c("longitude", "latitude"), crs = 2056) 
+
+map <- mapview(working_dataset_result, 
+               zcol = "transport_mode", 
+               layer.name = "Transport Mode",
+               alpha.regions = 0.6,
+               size = 3) +
+  mapview(working_dataset_result, zcol = "model.final")
+
+# Show the interactive map
+map
+```
+
 ```{r Accuracy}
 
 # Confusion Matrix
@@ -151,6 +168,63 @@ working_dataset_result <- data.frame(working_dataset, model.final)
 # It provides a balance between precision and recall and is useful when both false positives and false negatives are important.
 (f1_score <- conf_matrix$byClass[, "F1"])
 ```
+
+
+```{r}
+# Run a loop to identify outlier points in classification. If prevous and following x points are identical, 
+# but the middle one is different it is changed
+
+# Assuming your dataframe is named "df" and contains the attribute "model.final"
+
+# Define the number of previous and following points to consider
+x <- 3
+
+# Loop through the dataframe and update the value of "model.final" if the surrounding points match
+for (i in 1:nrow(working_dataset_result)) {
+  current_value <- working_dataset_result$model.final[i]
+  
+  # Check previous x points
+  if (i >= x) {
+    previous_values <- working_dataset_result$model.final[(i - x):(i - 1)]
+    if (all(previous_values == current_value)) {
+      working_dataset_result$model.final[(i - x + 1):i] <- current_value
+    }
+  }
+  
+  # # Check following x points
+  # if (i <= (nrow(working_dataset_result) - x + 1)) {
+  #   following_values <- working_dataset_result$model.final[(i + 1):(i + x)]
+  #   if (all(following_values == current_value)) {
+  #     working_dataset_result$model.final[i:(i + x - 1)] <- current_value
+  #   }
+  # }
+}
+
+```
+
+
+```{r}
+# Confusion Matrix for new results
+(conf_matrix_2 <- confusionMatrix(as.factor(working_dataset_result$transport_mode), working_dataset_result$model.final))
+
+# Precision for each class
+# Precision: Precision measures the proportion of correctly predicted positive instances out of the total 
+# instances predicted as positive. 
+# It is useful when the focus is on minimizing false positives.
+(precision_2 <- conf_matrix_2$byClass[, "Precision"])
+
+# Recall for each class
+# Recall (Sensitivity or True Positive Rate): Recall measures the proportion of 
+# correctly predicted positive instances out of the total actual positive instances. 
+# It is useful when the goal is to minimize false negatives.
+(recall_2 <- conf_matrix_2$byClass[, "Recall"])
+
+# F1-Score for each class
+# F1-Score: The F1-score combines precision and recall into a single metric. 
+# It provides a balance between precision and recall and is useful when both false positives and false negatives are important.
+(f1_score_2 <- conf_matrix_2$byClass[, "F1"])
+```
+
 
 
 ```{r CNN}
