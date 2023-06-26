@@ -30,41 +30,24 @@ working_dataset <- working_dataset[working_dataset$transport_mode != "", ]
 working_dataset <- working_dataset[working_dataset$transport_mode != "Other1", ]
 working_dataset <- working_dataset[working_dataset$transport_mode != "Funicular", ]
 working_dataset <- working_dataset[working_dataset$transport_mode != "E_Kick_Scooter", ]
-working_dataset <- working_dataset[working_dataset$transport_mode != "Run", ]
+# working_dataset <- working_dataset[working_dataset$transport_mode != "Run", ]
 
 working_dataset <- working_dataset[,-c(1)]
 
-# Scale data
-working_dataset <- data.frame(working_dataset[,c(1,2)],
-                              scale(working_dataset[,c(3:11)]))
 
 # Show class distribution
 table(working_dataset$transport_mode)
 ```
-
-```{r}
-# Map transport_mode to numeric values
-# Map Cluster to Transport Mode
-working_dataset$transport_mode[working_dataset$transport_mode == 'Walk'] <- 1
-working_dataset$transport_mode[working_dataset$transport_mode == 'Bus'] <- 2
-working_dataset$transport_mode[working_dataset$transport_mode == 'Tram'] <- 3
-working_dataset$transport_mode[working_dataset$transport_mode == 'Boat'] <- 4
-working_dataset$transport_mode[working_dataset$transport_mode == 'Train'] <- 5
-working_dataset$transport_mode[working_dataset$transport_mode == 'Skateboard'] <- 6
-working_dataset$transport_mode <- as.numeric(working_dataset$transport_mode)
-table(working_dataset$transport_mode)
-
-
-```
 ```{r}
 # Under sampling
+# -> Oversampling??
 
 # Set the maximum number of entries per class
-max_entries <- 500
+max_entries <- 150
 
 # Perform undersampling
-working_dataset <- working_dataset %>%
-  group_by(transport_mode) %>%
+working_dataset <- working_dataset |>
+  group_by(transport_mode) |>
   sample_n(min(n(), max_entries)) |>
   ungroup()
 
@@ -79,58 +62,106 @@ table(working_dataset$transport_mode)
 
 ```
 
-
-```{r Resampling}
-
-# # Identify the majority class
-# majority_class <- working_dataset %>%
-#   count(transport_mode) %>%
-#   filter(n == max(n)) %>%
-#   pull(transport_mode)
-# 
-# # Resample minority classes one by one
-# resampled_dataset <- working_dataset
-# unique_classes <- unique(working_dataset$transport_mode)
-# 
-# 
-# # View the resampled dataset
-# table(resampled_dataset$transport_mode)
-
-# set.seed(42)
-# index <- createDataPartition(working_dataset$transport_mode, p = 0.7, list = FALSE)
-# train_data <- working_dataset[index, ]
-# test_data  <- working_dataset[-index, ]
-# 
-# ctrl <- trainControl(method = "repeatedcv", 
-#                      number = 10, 
-#                      repeats = 10, 
-#                      verboseIter = FALSE,
-#                      sampling = "up")
-# 
-# set.seed(42)
-# model_rf_over <- caret::train(transport_mode ~ .,
-#                          data = train_data,
-#                          method = "rf",
-#                          preProcess = c("scale", "center"),
-#                          trControl = ctrl)
-# 
-
-
-```
-
 # 5. k-means
 
 ```{r}
+working_dasaset <- working_dataset[,-c(2)]
+working_dataset$transport_mode <- as.factor(working_dataset$transport_mode)
 
-# Perform k-means clustering
-num_clusters <- 6  # Number of clusters
-result_kmeans <- kmeans(working_dataset[, c(5, 11)], centers = num_clusters, algorithm = "Forgy", nstart = 20) 
+TrainingIndex <- createDataPartition(working_dataset$transport_mode, p = 0.8, list = F)
+TrainingSet <- working_dasaset[TrainingIndex,]
+TestingSet <- working_dasaset[-TrainingIndex,]
+
+# Build Training Model
+model <- train(transport_mode ~ ., 
+               data = TrainingSet,
+               method = "svmPoly",
+               na.action = na.omit,
+               preprocess = c("sclae","center"),
+               trControl = trainControl(method = "none"),
+               tuneGrid = data.frame(degree = 1, scale = 1, C = 1)
+               )
+
+# Build CV Model
+model.cv <- train(transport_mode ~ ., 
+               data = TrainingSet,
+               method = "svmPoly",
+               na.action = na.omit,
+               preprocess = c("sclae","center"),
+               trControl = trainControl(method = "cv", number = 10),
+               tuneGrid = data.frame(degree = 1, scale = 1, C = 1)
+               )
 
 
-# Get the cluster assignments
-kmeans_cluster <- data.frame(result_kmeans[1])
+# Make Predictions
+model.training <- predict(model, TrainingSet)
+model.testing <- predict(model, TestingSet)
+model.cv <- predict(model.cv, TrainingSet)
 
-kmeans_cluster <- left_join(kmeans_cluster,working_dataset, by = "id")
+
+
+
+
+# Model Performance
+model.training.confusion <- confusionMatrix(model.training, as.factor(TrainingSet$transport_mode))
+model.testing.confusion <- confusionMatrix(model.testing, as.factor(TestingSet$transport_mode))
+model.cv.confusion <- confusionMatrix(model.cv, as.factor(TrainingSet$transport_mode))
+
+
+print(model.training.confusion)
+print(model.testing.confusion)
+print(model.cv.confusion)
+
+
+# # Perform k-means clustering
+# num_clusters <- 6  # Number of clusters
+# result_kmeans <- kmeans(working_dataset[, c(5, 11)], centers = num_clusters, algorithm = "Forgy", nstart = 20) 
+# 
+# 
+# # Get the cluster assignments
+# kmeans_cluster <- data.frame(result_kmeans[1])
+# 
+# kmeans_cluster <- left_join(kmeans_cluster,working_dataset, by = "id")
+
+```
+```{r CNN}
+set.seed(100)
+
+# BUild CNN Model
+model.cnn <- train(transport_mode ~ ., 
+               data = TrainingSet,
+               method = "avNNet",
+               na.action = na.omit,
+               preprocess = c("scale", "center"),
+               trControl = trainControl(method = "cv", number = 10),
+               tuneGrid = data.frame(size = 1, decay = 0.1, bag = 100),
+               tuneLength = 10,  # Increase the tuneLength to explore more architectures
+               pool = list(pool = c(2, 2)),
+               convolve = list(kernel = c(3, 3), kernel = c(5, 5))  # Change filter sizes
+               )
+
+model.cnn.cv <- train(transport_mode ~ ., 
+               data = TrainingSet,
+               method = "avNNet",
+               na.action = na.omit,
+               preprocess = c("scale", "center"),
+
+               trControl = trainControl(method = "cv", number = 10),
+               tuneGrid = data.frame(size = 1, decay = 0.1, bag = 100),
+               tuneLength = 10,  # Increase the tuneLength to explore more architectures
+               pool = list(pool = c(2, 2)),
+               convolve = list(kernel = c(3, 3), kernel = c(5, 5))  # Change filter sizes
+               )
+
+# Make Predictions
+model.cnn.training <- predict(model.cnn, TrainingSet)
+model.cnn.testing <- predict(model.cnn, TestingSet)
+model.cnn.cv <- predict(model.cnn.cv, TrainingSet)
+
+
+(model.cnn.training.confusion <- confusionMatrix(model.cnn.training, as.factor(TrainingSet$transport_mode)))
+(model.cnn.testing.confusion <- confusionMatrix(model.cnn.testing, as.factor(TestingSet$transport_mode)))
+(model.cnn.cv.confusion <- confusionMatrix(model.cnn.cv, as.factor(TrainingSet$transport_mode)))
 
 ```
 
@@ -228,42 +259,7 @@ input_plot
 sum(diag(confusion_matrix))/sum(confusion_matrix)
 ```
 
-```{r CNN Model}
-# set.seed(100)
-# # Create Training and Test data set
-# data_rows <- floor(0.80*nrow(posmo_cnn))
-# train_indices <- sample(c(1:nrow(posmo_cnn)), data_rows)
-# train_data <- posmo_cnn[train_indices,]
-# test_data <- posmo_cnn[-train_indices,]
-# 
-# model <- neuralnet((transport_mode == 1) + (transport_mode == 2) + (transport_mode == 3) + 
-#                      (transport_mode == 4) + (transport_mode == 5) + (transport_mode == 6) ~ velocity + sinuosity,
-#                   data = train_data,
-#                   hidden = c(3,2),
-#                   lifesign.step = 1000,
-#                   linear.output = T)
-# 
-# 
-```
 
-```{r prediction}
-
-# pred <- predict(model, test_data, rep = 1)
-# 
-# labels <- unique(posmo_cnn$transport_mode)
-# prediction_label <- data.frame(max.col(pred)) |>
-#   mutate(pred = labels[max.col.pred.]) |>
-#   select(2) |>
-#   unlist()
-# 
-# table(test_data$transport_mode, prediction_label)
-
-```
-
-```{r}
-(unique(working_dataset$transport_mode))
-
-```
 
 # 6. Evaluation
 
