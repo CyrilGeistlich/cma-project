@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: The title of your Semesterproject
 subtitle: A subtle subtitle
@@ -517,3 +518,461 @@ ggsave("plots/map_plot.png", plot = map_plot, width = 8, height = 6, dpi = 300)
 
 ```
 
+=======
+---
+title: The title of your Semesterproject
+subtitle: A subtle subtitle
+author: Cyril Geistlich and Micha Franz
+output: html
+editor: visual
+  markdown: 
+    wrap: 72
+---
+
+<!-- You can add  your R Code with Code chunks-->
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+
+# You can set chunk options individually per code chunk, as was done with this
+# code chunk.
+
+# echo: false           hides the code from the generated output
+# warning: false        hides warnings from the generated output
+# message: false        hides messages from the generated output
+
+# To apply the setting for all code chunks, add the options to the yaml header of the document (in between the ---) without the preceeding "#|".
+
+```
+
+## Abstract
+
+This project aims to investigate key factors and features in GPS tracking data to differentiate transportation vehicles. Machine learning is applied to automate transportation mode detection using spatial, temporal, and attribute analysis. Manual verification of results ensures accuracy. The findings contribute to computational movement analysis and automated transportation mode detection.
+
+## Introduction
+
+## Research Question
+
+What are the key factors and features that can be extracted from GPS tracking data to differentiate between different types of transportation modes? How can machine learning techniques be applied to GPS tracking data to automate the detection of the mode of transportation and which accuracies can be achieved by different machine learning algorithms?
+
+## Material and Methods
+
+<!-- the following is just a placeholder text, remove it!-->
+
+### Removing false movement and static points
+
+When tracking a person throughout the day using GPS data, there are instances where the person appears to be stationary, such as when in an office or at a university. However, due to GPS inaccuracies, these stationary points may not appear at the exact same location and can exhibit erratic movement patterns. The accuracy of GPS signals is often compromised in dense buildings, amplifying this phenomenon. As a result, parameters like velocity and step length can show values that are typically associated with other categories. To address this issue, two approaches have been employed. 
+
+The first approach involves analyzing the angles between consecutive points. Typically, these angles are significantly smaller for stationary points compared to other movements. By visually determining a threshold angle (X), the dataset is filtered to remove all data points with angles smaller than X. This process needs to be repeated iteratively until no angles below the threshold remain, as the removal of data points alters the angles between the remaining points.
+
+The second approach considers the distance between the current point and a set number (X) of preceding and consecutive points. A point is deemed static if the maximum distance between that point and any of the X preceding or consecutive points exceeds a predefined threshold (X). However, this approach may unintentionally remove non-static data points, particularly when a person is walking slowly and numerous data points are recorded within a small distance. Adjusting the distance threshold or the number of preceding and consecutive points can mitigate this issue, but it requires striking a balance between filtering out false movements and retaining genuine data.
+
+Finding the optimal compromise between these filtering approaches involves considering the specific characteristics of the tracked person's movements and the quality of the GPS data. By iteratively applying the angle-based filtering and analyzing the distance to surrounding points, a more accurate identification of stationary periods can be achieved, mitigating the impact of GPS inaccuracies and preserving the integrity of the tracking data.
+
+## Results
+
+<!-- the following is just a placeholder text, remove it!-->
+
+Philosophy oneself passion play fearful self noble zarathustra deceptions sexuality. Endless ocean of oneself dead ocean. Selfish decrepit.
+
+## Discussion
+
+<!-- the following is just a placeholder text, remove it!-->
+
+Justice convictions spirit sexuality insofar free marvelous joy. Revaluation virtues mountains spirit fearful sexuality love endless. Society intentions will noble burying aversion moral. Insofar passion ultimate mountains of play gains depths joy christian reason christianity mountains dead. Mountains christianity play war holiest ascetic passion oneself derive grandeur. Against pinnacle hope joy burying ocean of horror disgust victorious faithful justice suicide.
+
+## Code
+
+```{r, warning = F}
+library("dplyr")
+library("sf")
+library("readr") 
+library("ggplot2")
+library("mapview")
+library("lubridate")
+library("zoo") 
+library("caret")
+library("neuralnet")
+library("mlbench")
+# library("keras")
+# library("tensorflow")
+library("LearnGeom") # to calculate angle
+library("randomForest")
+library("geosphere") # to calculate distances
+library("RColorBrewer") # to create custom color palettes
+library("ggcorrplot")
+```
+
+## supporting functions
+
+```{r}
+custom_mapview <- function(sf_object){
+  mapview(sf_object, cex = 4, col.regions = "#700101")
+}
+
+# creates lines out of points for visualisation purposes
+point2line <- function(points){
+  geometries <- st_cast(st_geometry(points %>% select(geometry)), "POINT")
+  n <- length(geometries) - 1
+  linestrings <- lapply(X = 1:n, FUN = function(x) {
+
+  pair <- st_combine(c(geometries[x], geometries[x + 1]))
+  line <- st_cast(pair, "LINESTRING")
+  return(line)
+  })
+  
+  multilinetring <- st_multilinestring(do.call("rbind", linestrings))
+  
+  df <- data.frame(linestrings[1])
+  
+  for (i in 2:length(linestrings)){
+    temp <- data.frame(linestrings[i])
+    df <-  rbind(df, temp) 
+  }
+  sf_lines <- df %>% st_as_sf()
+}
+
+un_col <- function(df){
+  return(length(unique(df)))
+}
+```
+
+# 1. Data Prep
+
+## 1.1 Read Data
+
+```{r read tracking data}
+#posmo_truth_csv <- read.delim("data/posmo_full.csv",sep=",")
+posmo_micha_truth_csv <- read.delim("data/manually_labelled/posmo_20230502_to_20230613_m.csv",sep=",") 
+posmo_micha_csv <- read.delim("data/posmo_labelled/posmo_20230502_to_20230613_p.csv",sep=",") 
+```
+
+```{r read context data}
+
+#zvv_sbahn <- st_read("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_S_BAHN_LINIEN_L") 
+
+#zvv_tram_bus <- st_read("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_LINIEN_GEN_L") 
+
+#seen <- read_sf("data/gewaesser.shp")
+```
+
+## 1.2.1 Clean and preprocess data
+
+```{r preprocess data}
+
+# posmo_raw <- read.delim("data/posmo_26_05_2023.csv",sep=",")
+# posmo_raw <- st_as_sf(posmo_raw,coords=c("lon_x", "lat_y"), crs = 2056)
+#mapview(posmo_truth)
+
+process_posmo_data <- function(posmo_data) { # function with preprocessing steps
+
+  # Convert to sf object
+  posmo_data <- posmo_data %>%
+    st_as_sf(coords = c("lon_x", "lat_y"), crs = 4326) %>%
+    st_transform(crs = 2056)
+  
+  # Remove unwanted columns
+  posmo_data <- posmo_data[, -c(1, 3, 4)]
+  
+  # Fix Timestamp
+  posmo_data$datetime <- ymd_hms(posmo_data$datetime) + hours(2)
+  
+  # Add ID to rows
+  posmo_data <- posmo_data %>%
+    mutate(id = row_number())
+  
+  # remove duplicate time values
+  posmo_data <- posmo_data[!duplicated(posmo_data$datetime), ]
+  
+  # remove subsequent duplicate location (person wasn't moving)
+  posmo_data <- posmo_data %>% 
+    filter(geometry != lead(geometry))
+  
+  return(posmo_data)
+}
+
+posmo_micha_truth <- process_posmo_data(posmo_micha_truth_csv)
+
+posmo_micha <-  process_posmo_data(posmo_micha_csv)
+```
+
+```{r working datasets}
+micha_subset <- posmo_micha_truth %>% filter(datetime < ymd("20230506") & datetime > ymd("20230501"))
+
+working_dataset <- micha_subset
+```
+
+
+### 1.2.2 Remove static data points
+```{r function to filter static points using moving distance}
+filterStaticByDistance <- function(data, threshold_distance, consecutive_points) {
+  require(geosphere)
+  
+  # transform to WGS84, necessary to calculate distance using geosphere
+  data <- data %>% st_transform(4326)
+  
+  # Extract coordinates from the geometry
+  coords <- data.frame(st_coordinates(data))
+  data$longitude <- coords$X
+  data$latitude <- coords$Y
+  
+  # Calculate distances to preceding and consecutive points
+  distances <- numeric(nrow(data))
+  for (i in (consecutive_points + 1):(nrow(data) - consecutive_points)) {
+    next_points <- coords[(i + 1):(i + consecutive_points), ]
+    prev_points <- coords[(i - 1):(i - consecutive_points), ]
+    all_points <- rbind(next_points, prev_points)
+    distances[i] <- max(geosphere::distGeo(coords[i, ], all_points))
+  }
+  
+  # Filter out points where the maximum distance exceeds the threshold
+  filtered_data <- data[distances >= threshold_distance | distances == 0, ] # keep first/last values which are 0
+  
+  # Transform back to LV95
+  filtered_data <- filtered_data %>% st_transform(2056)
+  
+  return(list(filtered_data = filtered_data, distances = distances)) # distances are just needed for testing thresholds
+}
+```
+
+
+```{r Function to calculate angle }
+getAngle <- function(coords) {
+  angles <- numeric(nrow(coords)) # Initialize angles as a numeric vector
+  angles[1] = NA # first point can't have an angle
+
+  for (i in 2:(nrow(coords) - 1)) { # calculate the angle for 3 consecutive points, similar to lag/lead
+    angle <- Angle( #function from library LearnGeom
+      c(coords[i - 1, "X"], coords[i - 1, "Y"]),
+      c(coords[i, "X"], coords[i, "Y"]),
+      c(coords[i + 1, "X"], coords[i + 1, "Y"])
+    )
+    angles[i] <- angle # Assign the calculated angle to the corresponding index in angles
+  }
+  angles[nrow(coords)] = NA # last point cant have an angle
+  return(c(angles))
+}
+```
+
+
+```{r function to remove static points by angle}
+filterStaticByAngle <- function(working_dataset, angleTreshold){
+  coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)  
+  working_dataset$angle <- getAngle(coords)
+  min_angle <- min(working_dataset$angle, na.rm = T)
+
+
+  while (min_angle <= angleTreshold) { # iteratively filter out tight angles until none smaller 60 are left
+    working_dataset <- working_dataset %>% filter(is.na(angle) | angle > angleTreshold) # exclude first and last value (=NA)
+    coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
+    working_dataset$angle <- getAngle(coords)
+    min_angle <- min(working_dataset$angle, na.rm = T)
+  }
+  return(working_dataset)
+}
+```
+
+
+
+```{r Actual removal of static points}
+result <- filterStaticByDistance(working_dataset, threshold_distance = 60, consecutive_points = 5)
+
+filteredByDistance <- result$filtered_data
+working_dataset$distances <- result$distances # just for testing threshold values
+filteredByAngle <- filterStaticByAngle(working_dataset, 60)
+filtertedByDistance_and_Angle <- filterStaticByAngle(filteredByDistance, 60)
+```
+
+```{r Visualistion of angle removal}
+filtered_data_line <- point2line(filtertedByDistance_and_Angle)
+filtered_angle_line <- point2line(filteredByAngle)
+unfiltered_data_line <- point2line(working_dataset)
+
+pal_blue <- colorRampPalette(c("cyan", "blue"))
+pal_orng <- colorRampPalette(c("yellow", "red"))
+
+
+mapview(working_dataset, alpha.regions=1.0, col.regions = "#901010") +
+  mapview(unfiltered_data_line, color="#901010", lwd=2) +
+  mapview(filtertedByDistance_and_Angle, alpha.regions=1.0, col.regions="#008940") +
+  mapview(filtered_data_line, color="#008940", lwd=2) 
+
+
+mapview(working_dataset, alpha.regions=1.0, col.regions = "#901010", cex=4) +
+  mapview(unfiltered_data_line, color="#901010", lwd=2) +
+  mapview(filteredByAngle, alpha.regions=1.0, col.regions="orange", cex=4) +
+  mapview(filtered_angle_line, color="orange", lwd=2) 
+
+mapview(filtered_data_line, color="#008940", lwd=2) +
+  mapview(unfiltered_data_line, color="#901010", lwd=2)
+  
+```
+
+
+## 1.3 Segmentation?
+
+## 1.4 Calculate Movement Parameters
+
+### 1.4.1 Speed/ Additional Moving Window Speed?
+
+```{r Calc Diff_s, steplength, velocity}
+#Create Coord Column
+coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
+
+#Calculate Time Difference between steps (diff_s), steplenght and velocity. 
+working_dataset <- working_dataset |> 
+  mutate(diff_s = as.numeric(difftime(lead(datetime),datetime))) |>
+  mutate(steplength = ((coords$X - lead(coords$X))^2 + (coords$Y - lead(coords$Y))^2)^0.5) |>
+  mutate(velocity = as.numeric(steplength/diff_s)) |>
+  filter(diff_s != 0)
+
+coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
+
+#Calculate Moving Window Step length
+working_dataset <- working_dataset |>
+  mutate(
+    step_mean = rowMeans(
+      cbind(
+        sqrt((lag(coords$X, 3) - coords$X)^2 + (lag(coords$Y, 3) - coords$Y)^2),
+        sqrt((lag(coords$X, 2) - coords$X)^2 + (lag(coords$Y, 2) - coords$Y)^2),
+        sqrt((lag(coords$X, 1) - coords$X)^2 + (lag(coords$Y, 1) - coords$Y)^2),
+        sqrt((coords$X - lead(coords$X, 1))^2 + (coords$Y - lead(coords$Y, 1))^2),
+        sqrt((coords$X - lead(coords$X, 2))^2 + (coords$Y - lead(coords$Y, 2))^2),
+        sqrt((coords$X - lead(coords$X, 3))^2 + (coords$Y - lead(coords$Y, 3))^2)
+      )
+    )
+  )
+
+
+#Calculate Moving Window diff_s
+working_dataset <- working_dataset |>
+  mutate(diff_s_mean = as.numeric(difftime(lead(datetime,3),lag(datetime,3)))/6)
+
+
+#Calculate Moving Window velocity
+working_dataset <- working_dataset |>
+  mutate(velocity_mean = as.numeric(step_mean/diff_s_mean))
+ 
+# Delete Infitinte Values (is there better solution?)
+#working_dataset$velocity <- working_dataset$velocity[!is.infinite(working_dataset$velocity)]
+coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
+
+
+```
+
+### 1.4.2 Acceleration /Moving Window?
+
+```{r Acceleration}
+#Acceleration stepwise
+working_dataset$acceleration <- working_dataset$velocity/lag(working_dataset$diff_s)
+
+# Calculate acceleration using a moving window
+working_dataset <- working_dataset |>
+  mutate(
+    acceleration_mean = rowMeans(
+      cbind(
+        lag(working_dataset$acceleration,3),
+        lag(working_dataset$acceleration,2),
+        lag(working_dataset$acceleration,1),
+        working_dataset$acceleration,
+        lead(working_dataset$acceleration,1),
+        lead(working_dataset$acceleration,2),
+        lead(working_dataset$acceleration,3)
+      )
+    )
+  )
+
+
+```
+
+### 1.4.3 Sinuosity /Moving Window?
+
+```{r Sinuosity}
+# Calculate Sinuosity using moving step_mean as path length and euclidean distance between
+
+
+working_dataset <- working_dataset |>
+  mutate(
+    sinuosity = 
+      ( # Path Length/Direct distance between first and last point
+        sqrt((lag(coords$X, 3) - lag(coords$X, 2))^2 + (lag(coords$Y, 3) - lag(coords$Y, 2))^2) +
+        sqrt((lag(coords$X, 2) - lag(coords$X, 1))^2 + (lag(coords$Y, 2) - lag(coords$Y, 1))^2) +
+        sqrt((lag(coords$X, 1) - coords$X)^2 + (lag(coords$Y, 1) - coords$Y)^2) +
+        sqrt((coords$X - lead(coords$X, 1))^2 + (coords$Y - lead(coords$Y, 1))^2) +
+        sqrt((lead(coords$X, 1) - lead(coords$X, 2))^2 + (lead(coords$Y, 1) - lead(coords$Y, 2))^2) +
+        sqrt((lead(coords$X, 2) - lead(coords$X, 3))^2 + (lead(coords$Y, 2) - lead(coords$Y, 3))^2)
+      ) 
+      / sqrt((lag(coords$X, 3) - lead(coords$X, 3))^2 + (lag(coords$Y, 3) - lead(coords$Y, 3))^2)
+  ) 
+
+
+```
+
+
+
+
+### 1.4.5 Closeness to Traffic Network
+
+### 1.4.6 Water Bodies (For boats)
+
+### 1.4.7 Slope?
+
+### 1.4.8 Average Distance between points in section
+
+### Further Parameters!
+
+
+## Clean Data
+
+```{r}
+# Replace NA values with a specified value (e.g., mean, median, or 0)
+working_dataset[is.na(working_dataset)] <- 0  # Replace NA with 0
+
+
+velocity_plot <- ggplot(working_dataset, aes(id,velocity)) +
+  geom_point() +
+  ylab("velocity [m/s]")
+
+acceleration_plot <- ggplot(working_dataset, aes(id,acceleration)) +
+  geom_point() +
+  ylab("acceleration [m/s2]")
+
+sinuosity_plot <- ggplot(working_dataset, aes(id,sinuosity)) +
+  geom_point()
+
+# ggsave("plots/velocity_plot.png", plot = velocity_plot, width = 8, height = 6, dpi = 300)
+# ggsave("plots/acceleration_plot.png", plot = acceleration_plot, width = 8, height = 6, dpi = 300)
+# ggsave("plots/sinuosity_plot.png", plot = sinuosity_plot, width = 8, height = 6, dpi = 300)
+```
+
+```{r}
+working_dataset_copy <- working_dataset
+```
+
+# 2.PCA?
+
+```{r}
+# select columns with relevant variable and standardize them
+standardized <- working_dataset[, 5:14] %>% 
+  st_drop_geometry() %>%
+  scale(center = TRUE, scale = TRUE) %>%
+  as.data.frame()
+
+
+corr_matrix <- cor(standardized)
+ggcorrplot(corr_matrix)
+
+data_pca <- princomp(corr_matrix)
+
+test <- data_pca$loadings
+
+scores <- as.data.frame(data_pca$scores)
+```
+
+
+# 3. Categories
+
+Stationary? Walk (Running?) Bike Train Tram Bus Car Skateboard E-Scooter Boat Other
+>>>>>>> 6b784b9407802dc48e6d071f5918fa4009ed7913

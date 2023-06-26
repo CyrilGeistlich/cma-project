@@ -1,0 +1,303 @@
+---
+title: "classification"
+author: "Cyril Geistlich & Micha Franz"
+format: html
+editor: source
+---
+```{r}
+library(ROSE)
+```
+
+
+# 4. Cluster
+```{r}
+working_dataset <- working_dataset_copy
+```
+
+```{r Data preparation}
+
+# Drop geom
+working_dataset <- st_drop_geometry(working_dataset)
+
+# Set threshold for parameters
+working_dataset <- working_dataset[working_dataset$velocity < 250,]
+working_dataset <- working_dataset[working_dataset$sinuosity < 5,]
+working_dataset <- working_dataset[working_dataset$acceleration < 20,]
+working_dataset <- working_dataset[working_dataset$diff_s < 1000,]
+
+# Filter unwanted categories
+working_dataset <- working_dataset[working_dataset$transport_mode != "", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "Other1", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "Funicular", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "E_Kick_Scooter", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "Run", ]
+
+working_dataset <- working_dataset[,-c(1)]
+
+# Scale data
+working_dataset <- data.frame(working_dataset[,c(1,2)],
+                              scale(working_dataset[,c(3:11)]))
+
+# Show class distribution
+table(working_dataset$transport_mode)
+```
+
+```{r}
+# Map transport_mode to numeric values
+# Map Cluster to Transport Mode
+working_dataset$transport_mode[working_dataset$transport_mode == 'Walk'] <- 1
+working_dataset$transport_mode[working_dataset$transport_mode == 'Bus'] <- 2
+working_dataset$transport_mode[working_dataset$transport_mode == 'Tram'] <- 3
+working_dataset$transport_mode[working_dataset$transport_mode == 'Boat'] <- 4
+working_dataset$transport_mode[working_dataset$transport_mode == 'Train'] <- 5
+working_dataset$transport_mode[working_dataset$transport_mode == 'Skateboard'] <- 6
+working_dataset$transport_mode <- as.numeric(working_dataset$transport_mode)
+table(working_dataset$transport_mode)
+
+
+```
+```{r}
+# Under sampling
+
+# Set the maximum number of entries per class
+max_entries <- 500
+
+# Perform undersampling
+working_dataset <- working_dataset %>%
+  group_by(transport_mode) %>%
+  sample_n(min(n(), max_entries)) |>
+  ungroup()
+
+# Check the resulting undersampled DataFrame
+table(working_dataset$transport_mode)
+
+# Reset row names
+# rownames(working_dataset) <- 1:nrow(working_dataset) 
+# working_dataset <- working_dataset |>
+#   mutate(id = row_number()) # Reset IDs
+
+
+```
+
+
+```{r Resampling}
+
+# # Identify the majority class
+# majority_class <- working_dataset %>%
+#   count(transport_mode) %>%
+#   filter(n == max(n)) %>%
+#   pull(transport_mode)
+# 
+# # Resample minority classes one by one
+# resampled_dataset <- working_dataset
+# unique_classes <- unique(working_dataset$transport_mode)
+# 
+# 
+# # View the resampled dataset
+# table(resampled_dataset$transport_mode)
+
+# set.seed(42)
+# index <- createDataPartition(working_dataset$transport_mode, p = 0.7, list = FALSE)
+# train_data <- working_dataset[index, ]
+# test_data  <- working_dataset[-index, ]
+# 
+# ctrl <- trainControl(method = "repeatedcv", 
+#                      number = 10, 
+#                      repeats = 10, 
+#                      verboseIter = FALSE,
+#                      sampling = "up")
+# 
+# set.seed(42)
+# model_rf_over <- caret::train(transport_mode ~ .,
+#                          data = train_data,
+#                          method = "rf",
+#                          preProcess = c("scale", "center"),
+#                          trControl = ctrl)
+# 
+
+
+```
+
+# 5. k-means
+
+```{r}
+
+# Perform k-means clustering
+num_clusters <- 6  # Number of clusters
+result_kmeans <- kmeans(working_dataset[, c(5, 11)], centers = num_clusters, algorithm = "Forgy", nstart = 20) 
+
+
+# Get the cluster assignments
+kmeans_cluster <- data.frame(result_kmeans[1])
+
+kmeans_cluster <- left_join(kmeans_cluster,working_dataset, by = "id")
+
+```
+
+```{r}
+# Create a contingency table of cluster and transport_mode
+confusion_df <- kmeans_cluster %>%
+  count(cluster, transport_mode) %>%
+  spread(transport_mode, n, fill = 0)
+
+# Remove the cluster column
+confusion_df <- confusion_df[-1]
+
+# Convert the dataframe to a matrix
+confusion_matrix <- as.matrix(confusion_df)
+
+# Add labels to the confusion matrix
+colnames(confusion_matrix) <- paste("Predicted:", colnames(confusion_matrix))
+rownames(confusion_matrix) <- paste("Observed:", rownames(confusion_df))
+
+# Display the confusion matrix
+confusion_matrix
+
+
+
+```
+
+
+
+```{r}
+# Calculate the most common cluster for each label
+kmeans_labels <- kmeans_cluster %>%
+  group_by(transport_mode) %>%
+  summarise(most_common_cluster = mode(cluster)) %>%
+  ungroup()
+
+kmeans_labels <- kmeans_cluster %>%
+  count(transport_mode, cluster) %>%
+  group_by(cluster)
+
+# # Print the cluster-label assig
+print(kmeans_labels)
+
+
+
+
+```
+
+```{r}
+kmeans_cluster  <- kmeans_cluster |>
+  group_by(cluster) 
+
+kmeans_cluster  <- kmeans_cluster |>
+  group_by(cluster, transport_mode) |>
+  tally()
+
+
+kmeans_cluster$labelClust <- NA
+kmeans_cluster$cluster <- kmeans_cluster$cluster[NA] <- 4
+
+for (i in 1:num_clusters){
+  cluster_temp <- kmeans_cluster |>
+    filter(cluster == i)
+  (max <- max(cluster_temp$n))
+  cluster_temp <- cluster_temp |>
+    filter(cluster_temp$n == max)
+  label <- cluster_temp$transport_mode
+  print(label)
+  kmeans_cluster$labelClust[cluster_temp$transport_mode == i] <- label
+}
+```
+
+```{r}
+
+input_plot <- ggplot(cluster_result,aes(transport_mode)) + 
+  geom_bar(color = "gray") +
+  labs(x = "Output Variable", y = "Frequency", title = "Histogram of Input Variables")
+
+# Print the cluster assignments
+output_plot <- ggplot(cluster_result) + 
+  geom_bar(aes(clustering.cluster),color = "gray") +
+  labs(x = "Output Variable", y = "Frequency", title = "Histogram of Cluster Result")
+
+ggsave("plots/input_plot.png", plot = input_plot, width = 8, height = 6, dpi = 300)
+ggsave("plots/output_plot.png", plot = output_plot, width = 8, height = 6, dpi = 300)
+output_plot
+input_plot
+```
+
+```{r confusion matrix}
+#kmeans_cluster <- na.omit(kmeans_cluster)
+(confusion_matrix <- table(kmeans_cluster$transport_mode, kmeans_cluster$labelCLust, dnn=c("Predicted, Observed")))
+```
+
+```{r Overall Accuracy}
+sum(diag(confusion_matrix))/sum(confusion_matrix)
+```
+
+```{r CNN Model}
+# set.seed(100)
+# # Create Training and Test data set
+# data_rows <- floor(0.80*nrow(posmo_cnn))
+# train_indices <- sample(c(1:nrow(posmo_cnn)), data_rows)
+# train_data <- posmo_cnn[train_indices,]
+# test_data <- posmo_cnn[-train_indices,]
+# 
+# model <- neuralnet((transport_mode == 1) + (transport_mode == 2) + (transport_mode == 3) + 
+#                      (transport_mode == 4) + (transport_mode == 5) + (transport_mode == 6) ~ velocity + sinuosity,
+#                   data = train_data,
+#                   hidden = c(3,2),
+#                   lifesign.step = 1000,
+#                   linear.output = T)
+# 
+# 
+```
+
+```{r prediction}
+
+# pred <- predict(model, test_data, rep = 1)
+# 
+# labels <- unique(posmo_cnn$transport_mode)
+# prediction_label <- data.frame(max.col(pred)) |>
+#   mutate(pred = labels[max.col.pred.]) |>
+#   select(2) |>
+#   unlist()
+# 
+# table(test_data$transport_mode, prediction_label)
+
+```
+
+```{r}
+(unique(working_dataset$transport_mode))
+
+```
+
+# 6. Evaluation
+
+# Visualisation
+
+```{r vis}
+visual <- data.frame(st_coordinates(working_dataset), working_dataset$velocity, working_dataset$acceleration, working_dataset$sinuosity)
+
+visual|> ggplot() +
+  geom_point(aes(X,Y,color = working_dataset.velocity))
+
+visual|> ggplot() +
+  geom_point(aes(X,Y,color = working_dataset.acceleration))
+
+visual|> ggplot() +
+  geom_point(aes(X,Y,color = working_dataset.sinuosity))
+
+ggplot(working_dataset, aes(id,sinuosity)) +
+  geom_point()
+
+cluster_result <- mutate(cluster_result, id = row_number())
+working_dataset <- mutate(working_dataset, id = row_number())
+
+cluster_join <- left_join(cluster_result, working_dataset, by = "id" )
+
+cluster_join$correct <- cluster_join$clustering.cluster == cluster_join$transport_mode.x
+cluster_join <- data.frame(cluster_join,st_coordinates(working_dataset))
+map_plot <- ggplot(cluster_join) +
+  geom_point(aes(X, Y, colour = correct), size = 1, alpha = 0.2)
+
+truefalse <- ggplot(cluster_join)+
+  geom_bar(aes(correct, fill = correct))
+
+ggsave("plots/truefalse.png", plot = truefalse, width = 8, height = 6, dpi = 300)
+ggsave("plots/map_plot.png", plot = map_plot, width = 8, height = 6, dpi = 300)
+  
+```
