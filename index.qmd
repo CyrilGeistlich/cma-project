@@ -355,17 +355,21 @@ cluster_result$clustering.cluster[cluster_result$clustering.cluster == '4'] <- '
 cluster_result$clustering.cluster[cluster_result$clustering.cluster == '5'] <- 'Walk'
 cluster_result$clustering.cluster[cluster_result$clustering.cluster == '6'] <- 'Tram'
 
-input_plot <- ggplot(cluster_result,aes(transport_mode)) + 
+input_plot <- ggplot(cluster_result, aes(transport_mode)) + 
   geom_bar(color = "gray") +
-  labs(x = "Output Variable", y = "Frequency", title = "Histogram of Input Variables")
+  labs(x = "Transportation Mode", y = "Frequency", title = "Histogram of Ground Truth") +
+  ylim(0, 4200)
+
+
 
 # Print the cluster assignments
 output_plot <- ggplot(cluster_result) + 
   geom_bar(aes(clustering.cluster),color = "gray") +
-  labs(x = "Output Variable", y = "Frequency", title = "Histogram of Cluster Result")
+  labs(x = "Transportation Mode", y = "Frequency", title = "Histogram of Cluster Result") +
+  ylim(0, 4200)
 
-ggsave("plots/input_plot.png", plot = input_plot, width = 8, height = 6, dpi = 300)
-ggsave("plots/output_plot.png", plot = output_plot, width = 8, height = 6, dpi = 300)
+ggsave("plots/input_plot.png", plot = input_plot, width = 4, height = 6, dpi = 300)
+ggsave("plots/output_plot.png", plot = output_plot, width = 4, height = 6, dpi = 300) 
 output_plot
 input_plot
 
@@ -451,5 +455,65 @@ truefalse <- ggplot(cluster_join)+
 ggsave("plots/truefalse.png", plot = truefalse, width = 8, height = 6, dpi = 300)
 ggsave("plots/map_plot.png", plot = map_plot, width = 8, height = 6, dpi = 300)
   
+```
+```{r 10-fold cross validation}
+# library(cluster)
+# library(caret)
+# library(lattice)
+# 
+# 
+# # Generate synthetic data with two classes
+# set.seed(123)
+# data <- rbind(matrix(rnorm(100, mean = -2), ncol = 2),
+#               matrix(rnorm(100, mean = 2), ncol = 2))
+# labels <- c(rep("Class A", 100), rep("Class B", 100))
+# 
+# # Define the number of folds for cross-validation
+# num_folds <- 10
+# 
+# # Create stratified cross-validation folds
+# folds <- data.frame(createDataPartition(labels, p = 0.8, list = FALSE))
+# 
+# # Initialize vectors to store cluster labels and accuracy scores
+# cluster_labels <- rep(NA, length(labels))
+# accuracy_scores <- numeric(num_folds)
+# 
+# # Perform cross-validation
+# for (fold in 1:num_folds) {
+#   # Obtain the training and test data for the current fold
+#   train_data <- data[folds$Resample1[-fold], ]
+#   train_labels <- labels[folds$Resample1[-fold]]
+#   test_data <- data[folds$Resample1[fold], ]
+#   test_labels <- labels[folds$Resample1[fold],]
+#   
+#   # Perform clustering using k-means algorithm on the training data
+#   k <- 2
+#   kmeans_result <- kmeans(train_data, centers = k, nstart = 10)
+#   
+#   # Assign cluster labels to the test data using majority voting
+#   test_clusters <- kmeans(test_data, centers = kmeans_result$centers)$cluster
+#   test_cluster_labels <- rep(NA, length(test_clusters))
+#   
+#   for (i in 1:k) {
+#     cluster_indices <- which(test_clusters == i)
+#     test_cluster_labels[cluster_indices] <- as.character(tables:::vec_counts(train_labels[cluster_indices])$key[1])
+#   }
+#   
+#   # Evaluate accuracy for the current fold
+#   accuracy_scores[fold] <- sum(test_cluster_labels == test_labels) / length(test_labels)
+#   
+#   # Store cluster labels for all data points
+#   cluster_labels[folds$Resample1[fold]] <- test_cluster_labels
+# }
+# 
+# # Compute average accuracy across all folds
+# average_accuracy <- mean(accuracy_scores)
+# 
+# # Print results
+# print("Cluster Labels:")
+# print(cluster_labels)
+# print(paste("Average Accuracy:", round(average_accuracy, 2)))
+#
+
 ```
 
