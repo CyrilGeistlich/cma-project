@@ -11,10 +11,12 @@ library(ROSE)
 
 # 4. Cluster
 ```{r}
+# working_dataset_copy <- working_dataset
 working_dataset <- working_dataset_copy
-```
 
-```{r Data preparation}
+working_dataset <- na.omit(working_dataset)
+
+working_dataset <- working_dataset[,-c(1,3:5)]
 
 # Drop geom
 working_dataset <- st_drop_geometry(working_dataset)
@@ -28,49 +30,51 @@ working_dataset <- working_dataset[working_dataset$diff_s < 1000,]
 # Filter unwanted categories
 working_dataset <- working_dataset[working_dataset$transport_mode != "", ]
 working_dataset <- working_dataset[working_dataset$transport_mode != "Other1", ]
-working_dataset <- working_dataset[working_dataset$transport_mode != "Funicular", ]
-working_dataset <- working_dataset[working_dataset$transport_mode != "E_Kick_Scooter", ]
+# working_dataset <- working_dataset[working_dataset$transport_mode != "Funicular", ]
+# working_dataset <- working_dataset[working_dataset$transport_mode != "E_Kick_Scooter", ]
 # working_dataset <- working_dataset[working_dataset$transport_mode != "Run", ]
 
-working_dataset <- working_dataset[,-c(1)]
+# working_dataset <- working_dataset[,-c(1)]
 
 
 # Show class distribution
 table(working_dataset$transport_mode)
 ```
+
 ```{r}
-# Under sampling
-# -> Oversampling??
-
-# Set the maximum number of entries per class
-max_entries <- 150
-
-# Perform undersampling
-working_dataset <- working_dataset |>
-  group_by(transport_mode) |>
-  sample_n(min(n(), max_entries)) |>
-  ungroup()
-
-# Check the resulting undersampled DataFrame
-table(working_dataset$transport_mode)
-
-# Reset row names
-# rownames(working_dataset) <- 1:nrow(working_dataset) 
+# # Under sampling
+# # -> Oversampling??
+# 
+# # Set the maximum number of entries per class
+# max_entries <- 150
+# 
+# # Perform undersampling
 # working_dataset <- working_dataset |>
-#   mutate(id = row_number()) # Reset IDs
+#   group_by(transport_mode) |>
+#   sample_n(min(n(), max_entries)) |>
+#   ungroup()
+# 
+# # Check the resulting undersampled DataFrame
+# table(working_dataset$transport_mode)
+# 
+# # Reset row names
+# # rownames(working_dataset) <- 1:nrow(working_dataset) 
+# # working_dataset <- working_dataset |>
+# #   mutate(id = row_number()) # Reset IDs
 
 
 ```
 
-# 5. k-means
+# 5. support vector machine
 
 ```{r}
-working_dasaset <- working_dataset[,-c(2)]
+
+
 working_dataset$transport_mode <- as.factor(working_dataset$transport_mode)
 
 TrainingIndex <- createDataPartition(working_dataset$transport_mode, p = 0.8, list = F)
-TrainingSet <- working_dasaset[TrainingIndex,]
-TestingSet <- working_dasaset[-TrainingIndex,]
+TrainingSet <- working_dataset[TrainingIndex,]
+TestingSet <- working_dataset[-TrainingIndex,]
 
 # Build Training Model
 model <- train(transport_mode ~ ., 
@@ -103,27 +107,52 @@ model.cv <- predict(model.cv, TrainingSet)
 
 
 # Model Performance
-model.training.confusion <- confusionMatrix(model.training, as.factor(TrainingSet$transport_mode))
-model.testing.confusion <- confusionMatrix(model.testing, as.factor(TestingSet$transport_mode))
-model.cv.confusion <- confusionMatrix(model.cv, as.factor(TrainingSet$transport_mode))
+(model.training.confusion <- confusionMatrix(model.training, as.factor(TrainingSet$transport_mode)))
+(model.testing.confusion <- confusionMatrix(model.testing, as.factor(TestingSet$transport_mode)))
+(model.cv.confusion <- confusionMatrix(model.cv, as.factor(TrainingSet$transport_mode)))
 
 
-print(model.training.confusion)
-print(model.testing.confusion)
-print(model.cv.confusion)
-
-
-# # Perform k-means clustering
-# num_clusters <- 6  # Number of clusters
-# result_kmeans <- kmeans(working_dataset[, c(5, 11)], centers = num_clusters, algorithm = "Forgy", nstart = 20) 
-# 
-# 
-# # Get the cluster assignments
-# kmeans_cluster <- data.frame(result_kmeans[1])
-# 
-# kmeans_cluster <- left_join(kmeans_cluster,working_dataset, by = "id")
 
 ```
+
+```{r}
+# Run Model on full dataset
+model.final <- predict(model, working_dataset)
+model.final.confusion <- confusionMatrix(model.final, as.factor(working_dataset$transport_mode))
+
+# Save and Print final model confusion matrix
+(model.final.table <- model.final.confusion[[2]])
+
+working_dataset_result <- data.frame(working_dataset, model.final)
+
+
+
+
+```
+```{r Accuracy}
+
+# Confusion Matrix
+(conf_matrix <- confusionMatrix(working_dataset_result$transport_mode, working_dataset_result$model.final))
+
+# Precision for each class
+# Precision: Precision measures the proportion of correctly predicted positive instances out of the total 
+# instances predicted as positive. 
+# It is useful when the focus is on minimizing false positives.
+(precision <- conf_matrix$byClass[, "Precision"])
+
+# Recall for each class
+# Recall (Sensitivity or True Positive Rate): Recall measures the proportion of 
+# correctly predicted positive instances out of the total actual positive instances. 
+# It is useful when the goal is to minimize false negatives.
+(recall <- conf_matrix$byClass[, "Recall"])
+
+# F1-Score for each class
+# F1-Score: The F1-score combines precision and recall into a single metric. 
+# It provides a balance between precision and recall and is useful when both false positives and false negatives are important.
+(f1_score <- conf_matrix$byClass[, "F1"])
+```
+
+
 ```{r CNN}
 set.seed(100)
 
@@ -145,7 +174,6 @@ model.cnn.cv <- train(transport_mode ~ .,
                method = "avNNet",
                na.action = na.omit,
                preprocess = c("scale", "center"),
-
                trControl = trainControl(method = "cv", number = 10),
                tuneGrid = data.frame(size = 1, decay = 0.1, bag = 100),
                tuneLength = 10,  # Increase the tuneLength to explore more architectures

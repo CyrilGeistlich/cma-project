@@ -126,7 +126,10 @@ un_col <- function(df){
 ```{r read tracking data}
 #posmo_truth_csv <- read.delim("data/posmo_full.csv",sep=",")
 posmo_micha_truth_csv <- read.delim("data/manually_labelled/posmo_20230502_to_20230613_m.csv",sep=",") 
+posmo_cyril_truth_csv <- read.delim("data/manually_labelled/posmo_2023-05-01T00_00_00+02_00-2023-06-26T23_59_59+02_00.csv",sep=",") 
 posmo_micha_csv <- read.delim("data/posmo_labelled/posmo_20230502_to_20230613_p.csv",sep=",") 
+
+combined_df <- rbind(posmo_micha_truth_csv, posmo_cyril_truth_csv)
 ```
 
 ```{r read context data}
@@ -174,7 +177,7 @@ process_posmo_data <- function(posmo_data) { # function with preprocessing steps
 }
 
 posmo_micha_truth <- process_posmo_data(posmo_micha_truth_csv)
-
+posmo_cyril_truth <- process_posmo_data(posmo_cyril_truth_csv)
 posmo_micha <-  process_posmo_data(posmo_micha_csv)
 ```
 
@@ -257,8 +260,8 @@ filterStaticByAngle <- function(working_dataset, angleTreshold){
 
 
 ```{r Actual removal of static points}
-result <- filterStaticByDistance(working_dataset, threshold_distance = 60, consecutive_points = 5)
 
+result <- filterStaticByDistance(working_dataset, threshold_distance = 60, consecutive_points = 5)
 filteredByDistance <- result$filtered_data
 working_dataset$distances <- result$distances # just for testing threshold values
 filteredByAngle <- filterStaticByAngle(working_dataset, 60)
@@ -298,20 +301,24 @@ mapview(filtered_data_line, color="#008940", lwd=2) +
 ### 1.4.1 Speed/ Additional Moving Window Speed?
 
 ```{r Calc Diff_s, steplength, velocity}
-#Create Coord Column
-coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
 
-#Calculate Time Difference between steps (diff_s), steplenght and velocity. 
-working_dataset <- working_dataset |> 
+
+calc_movement_params <- function(working_dataset){
+
+  # Create Coord Column
+  coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
+
+  # Calculate Time Difference between steps (diff_s), steplenght and velocity. 
+  working_dataset <- working_dataset |> 
   mutate(diff_s = as.numeric(difftime(lead(datetime),datetime))) |>
   mutate(steplength = ((coords$X - lead(coords$X))^2 + (coords$Y - lead(coords$Y))^2)^0.5) |>
   mutate(velocity = as.numeric(steplength/diff_s)) |>
   filter(diff_s != 0)
 
-coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
-
-#Calculate Moving Window Step length
-working_dataset <- working_dataset |>
+  coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
+  
+  #Calculate Moving Window Step length
+  working_dataset <- working_dataset |>
   mutate(
     step_mean = rowMeans(
       cbind(
@@ -324,32 +331,25 @@ working_dataset <- working_dataset |>
       )
     )
   )
-
-
-#Calculate Moving Window diff_s
-working_dataset <- working_dataset |>
+  
+  
+  #Calculate Moving Window diff_s
+  working_dataset <- working_dataset |>
   mutate(diff_s_mean = as.numeric(difftime(lead(datetime,3),lag(datetime,3)))/6)
 
-
-#Calculate Moving Window velocity
-working_dataset <- working_dataset |>
+  #Calculate Moving Window velocity
+  working_dataset <- working_dataset |>
   mutate(velocity_mean = as.numeric(step_mean/diff_s_mean))
  
-# Delete Infitinte Values (is there better solution?)
-#working_dataset$velocity <- working_dataset$velocity[!is.infinite(working_dataset$velocity)]
-coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
+  # Delete Infitinte Values (is there better solution?)
+  #working_dataset$velocity <- working_dataset$velocity[!is.infinite(working_dataset$velocity)]
+  coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)
 
+  #Acceleration stepwise
+  working_dataset$acceleration <- working_dataset$velocity/lag(working_dataset$diff_s)
 
-```
-
-### 1.4.2 Acceleration /Moving Window?
-
-```{r Acceleration}
-#Acceleration stepwise
-working_dataset$acceleration <- working_dataset$velocity/lag(working_dataset$diff_s)
-
-# Calculate acceleration using a moving window
-working_dataset <- working_dataset |>
+  # Calculate acceleration using a moving window
+  working_dataset <- working_dataset |>
   mutate(
     acceleration_mean = rowMeans(
       cbind(
@@ -363,17 +363,9 @@ working_dataset <- working_dataset |>
       )
     )
   )
-
-
-```
-
-### 1.4.3 Sinuosity /Moving Window?
-
-```{r Sinuosity}
-# Calculate Sinuosity using moving step_mean as path length and euclidean distance between
-
-
-working_dataset <- working_dataset |>
+  
+  # Calculate Sinuosity using moving step_mean as path length and euclidean distance between
+  working_dataset <- working_dataset |>
   mutate(
     sinuosity = 
       ( # Path Length/Direct distance between first and last point
@@ -387,10 +379,32 @@ working_dataset <- working_dataset |>
       / sqrt((lag(coords$X, 3) - lead(coords$X, 3))^2 + (lag(coords$Y, 3) - lead(coords$Y, 3))^2)
   ) 
 
+  return(working_dataset)
+}
+
+
+
+
+
+
 
 ```
 
+```{r combine data}
+# run Preprocessing
+result <- filterStaticByDistance(posmo_micha_truth, threshold_distance = 60, consecutive_points = 5)
+result$filtered_data
+filtered_by_angle <- filterStaticByAngle(result$filtered_data, 60)
+working_dataset <- calc_movement_params(filtered_by_angle)
 
+result <- filterStaticByDistance(posmo_cyril_truth, threshold_distance = 60, consecutive_points = 5)
+result$filtered_data
+filtered_by_angle <- filterStaticByAngle(result$filtered_data, 60)
+
+# Combine datasets
+working_dataset <- rbind(working_dataset,calc_movement_params(filtered_by_angle))
+
+```
 
 
 ### 1.4.5 Closeness to Traffic Network
@@ -422,6 +436,8 @@ acceleration_plot <- ggplot(working_dataset, aes(id,acceleration)) +
 sinuosity_plot <- ggplot(working_dataset, aes(id,sinuosity)) +
   geom_point()
 
+
+
 # ggsave("plots/velocity_plot.png", plot = velocity_plot, width = 8, height = 6, dpi = 300)
 # ggsave("plots/acceleration_plot.png", plot = acceleration_plot, width = 8, height = 6, dpi = 300)
 # ggsave("plots/sinuosity_plot.png", plot = sinuosity_plot, width = 8, height = 6, dpi = 300)
@@ -431,11 +447,17 @@ sinuosity_plot <- ggplot(working_dataset, aes(id,sinuosity)) +
 working_dataset_copy <- working_dataset
 ```
 
+```{r}
+# Combine data
+#working_dataset <- rbind(posmo_micha_truth_csv, posmo_cyril_truth_csv)
+```
+
+
 # 2.PCA?
 
 ```{r}
 # select columns with relevant variable and standardize them
-standardized <- working_dataset[, 5:14] %>% 
+standardized <- working_dataset_copy[, 5:14] %>% 
   st_drop_geometry() %>%
   scale(center = TRUE, scale = TRUE) %>%
   as.data.frame()
@@ -451,6 +473,11 @@ test <- data_pca$loadings
 scores <- as.data.frame(data_pca$scores)
 ```
 
+
+```{r}
+# Save full dataset as csv
+write.csv(working_dataset, file = "data/full_working_dataset.csv", row.names = FALSE)
+```
 
 # 3. Categories
 
