@@ -8,6 +8,27 @@ editor: source
 library(ROSE)
 ```
 
+```{r visualise parameters}
+
+# Visualise Parameter
+velocity_plot <- ggplot(working_dataset, aes(id,velocity)) +
+  geom_point() +
+  ylab("velocity [m/s]")
+
+acceleration_plot <- ggplot(working_dataset, aes(id,acceleration)) +
+  geom_point() +
+  ylab("acceleration [m/s2]")
+
+sinuosity_plot <- ggplot(working_dataset, aes(id,sinuosity)) +
+  geom_point()
+
+
+
+# ggsave("plots/velocity_plot.png", plot = velocity_plot, width = 8, height = 6, dpi = 300)
+# ggsave("plots/acceleration_plot.png", plot = acceleration_plot, width = 8, height = 6, dpi = 300)
+# ggsave("plots/sinuosity_plot.png", plot = sinuosity_plot, width = 8, height = 6, dpi = 300)
+```
+
 
 # 4. Cluster
 ```{r}
@@ -45,11 +66,12 @@ table(working_dataset$transport_mode)
 ```
 
 ```{r}
+# Makes model worse at this point
 # # Under sampling
 # # -> Oversampling??
 # 
 # # Set the maximum number of entries per class
-# max_entries <- 150
+# max_entries <- 1000
 # 
 # # Perform undersampling
 # working_dataset <- working_dataset |>
@@ -61,7 +83,7 @@ table(working_dataset$transport_mode)
 # table(working_dataset$transport_mode)
 # 
 # # Reset row names
-# # rownames(working_dataset) <- 1:nrow(working_dataset) 
+# # rownames(working_dataset) <- 1:nrow(working_dataset)
 # # working_dataset <- working_dataset |>
 # #   mutate(id = row_number()) # Reset IDs
 
@@ -71,7 +93,7 @@ table(working_dataset$transport_mode)
 # 5. support vector machine
 
 ```{r}
-
+set.seed(100)
 
 working_dataset$transport_mode <- as.factor(working_dataset$transport_mode)
 
@@ -88,6 +110,7 @@ model <- train(transport_mode ~ .,
                trControl = trainControl(method = "none"),
                tuneGrid = data.frame(degree = 1, scale = 1, C = 1)
                )
+
 
 # Build CV Model
 model.cv <- train(transport_mode ~ ., 
@@ -113,6 +136,7 @@ model.cv <- predict(model.cv, TrainingSet)
 (model.training.confusion <- confusionMatrix(model.training, as.factor(TrainingSet$transport_mode)))
 (model.testing.confusion <- confusionMatrix(model.testing, as.factor(TestingSet$transport_mode)))
 (model.cv.confusion <- confusionMatrix(model.cv, as.factor(TrainingSet$transport_mode)))
+
 
 
 
@@ -149,7 +173,7 @@ map
 ```{r Accuracy}
 
 # Confusion Matrix
-(conf_matrix <- confusionMatrix(working_dataset_result$transport_mode, working_dataset_result$model.final))
+(conf_matrix <- confusionMatrix(as.factor(working_dataset_result$transport_mode), working_dataset_result$model.final))
 
 # Precision for each class
 # Precision: Precision measures the proportion of correctly predicted positive instances out of the total 
@@ -178,20 +202,23 @@ map
 
 # Define the number of previous and following points to consider
 x <- 3
+count <- 0
+
 
 # Loop through the dataframe and update the value of "model.final" if the surrounding points match
 for (i in 1:nrow(working_dataset_result)) {
   current_value <- working_dataset_result$model.final[i]
-  
+
   # Check previous x points
   if (i >= x) {
     previous_values <- working_dataset_result$model.final[(i - x):(i - 1)]
     if (all(previous_values == current_value)) {
+      count <- count + 1
       working_dataset_result$model.final[(i - x + 1):i] <- current_value
     }
   }
+  # # Check following x points, does not work :(
   
-  # # Check following x points
   # if (i <= (nrow(working_dataset_result) - x + 1)) {
   #   following_values <- working_dataset_result$model.final[(i + 1):(i + x)]
   #   if (all(following_values == current_value)) {
@@ -199,6 +226,8 @@ for (i in 1:nrow(working_dataset_result)) {
   #   }
   # }
 }
+
+print(count)
 
 ```
 

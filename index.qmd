@@ -261,35 +261,35 @@ filterStaticByAngle <- function(working_dataset, angleTreshold){
 
 ```{r Actual removal of static points}
 
-result <- filterStaticByDistance(working_dataset, threshold_distance = 60, consecutive_points = 5)
-filteredByDistance <- result$filtered_data
-working_dataset$distances <- result$distances # just for testing threshold values
-filteredByAngle <- filterStaticByAngle(working_dataset, 60)
-filtertedByDistance_and_Angle <- filterStaticByAngle(filteredByDistance, 60)
+# result <- filterStaticByDistance(working_dataset, threshold_distance = 60, consecutive_points = 5)
+# filteredByDistance <- result$filtered_data
+# working_dataset$distances <- result$distances # just for testing threshold values
+# filteredByAngle <- filterStaticByAngle(working_dataset, 60)
+# filtertedByDistance_and_Angle <- filterStaticByAngle(filteredByDistance, 60)
 ```
 
 ```{r Visualistion of angle removal}
-filtered_data_line <- point2line(filtertedByDistance_and_Angle)
-filtered_angle_line <- point2line(filteredByAngle)
-unfiltered_data_line <- point2line(working_dataset)
-
-pal_blue <- colorRampPalette(c("cyan", "blue"))
-pal_orng <- colorRampPalette(c("yellow", "red"))
-
-
-mapview(working_dataset, alpha.regions=1.0, col.regions = "#901010") +
-  mapview(unfiltered_data_line, color="#901010", lwd=2) +
-  mapview(filtertedByDistance_and_Angle, alpha.regions=1.0, col.regions="#008940") +
-  mapview(filtered_data_line, color="#008940", lwd=2) 
-
-
-mapview(working_dataset, alpha.regions=1.0, col.regions = "#901010", cex=4) +
-  mapview(unfiltered_data_line, color="#901010", lwd=2) +
-  mapview(filteredByAngle, alpha.regions=1.0, col.regions="orange", cex=4) +
-  mapview(filtered_angle_line, color="orange", lwd=2) 
-
-mapview(filtered_data_line, color="#008940", lwd=2) +
-  mapview(unfiltered_data_line, color="#901010", lwd=2)
+# filtered_data_line <- point2line(filtertedByDistance_and_Angle)
+# filtered_angle_line <- point2line(filteredByAngle)
+# unfiltered_data_line <- point2line(working_dataset)
+# 
+# pal_blue <- colorRampPalette(c("cyan", "blue"))
+# pal_orng <- colorRampPalette(c("yellow", "red"))
+# 
+# 
+# mapview(working_dataset, alpha.regions=1.0, col.regions = "#901010") +
+#   mapview(unfiltered_data_line, color="#901010", lwd=2) +
+#   mapview(filtertedByDistance_and_Angle, alpha.regions=1.0, col.regions="#008940") +
+#   mapview(filtered_data_line, color="#008940", lwd=2) 
+# 
+# 
+# mapview(working_dataset, alpha.regions=1.0, col.regions = "#901010", cex=4) +
+#   mapview(unfiltered_data_line, color="#901010", lwd=2) +
+#   mapview(filteredByAngle, alpha.regions=1.0, col.regions="orange", cex=4) +
+#   mapview(filtered_angle_line, color="orange", lwd=2) 
+# 
+# mapview(filtered_data_line, color="#008940", lwd=2) +
+#   mapview(unfiltered_data_line, color="#901010", lwd=2)
   
 ```
 
@@ -300,7 +300,7 @@ mapview(filtered_data_line, color="#008940", lwd=2) +
 
 ### 1.4.1 Speed/ Additional Moving Window Speed?
 
-```{r Calc Diff_s, steplength, velocity}
+```{r Calc Diff_s, steplength, velocity , warning = F}
 
 
 calc_movement_params <- function(working_dataset){
@@ -383,11 +383,6 @@ calc_movement_params <- function(working_dataset){
 }
 
 
-
-
-
-
-
 ```
 
 ```{r combine data}
@@ -424,7 +419,6 @@ working_dataset <- rbind(working_dataset,calc_movement_params(filtered_by_angle)
 # Replace NA values with a specified value (e.g., mean, median, or 0)
 working_dataset[is.na(working_dataset)] <- 0  # Replace NA with 0
 
-
 velocity_plot <- ggplot(working_dataset, aes(id,velocity)) +
   geom_point() +
   ylab("velocity [m/s]")
@@ -447,17 +441,12 @@ sinuosity_plot <- ggplot(working_dataset, aes(id,sinuosity)) +
 working_dataset_copy <- working_dataset
 ```
 
-```{r}
-# Combine data
-#working_dataset <- rbind(posmo_micha_truth_csv, posmo_cyril_truth_csv)
-```
-
 
 # 2.PCA?
 
 ```{r}
 # select columns with relevant variable and standardize them
-standardized <- working_dataset_copy[, 5:14] %>% 
+standardized <- working_dataset_copy[, 6:15] %>% 
   st_drop_geometry() %>%
   scale(center = TRUE, scale = TRUE) %>%
   as.data.frame()
