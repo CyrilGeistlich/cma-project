@@ -12,6 +12,7 @@ library(gridExtra)
 
 ```{r load data}
 working_dataset <- read.delim("data/full_working_dataset.csv",sep=",", header = T) 
+
 ```
 
 # Parameter Visualization
@@ -148,8 +149,6 @@ grid.arrange(boxplot_acceleration_mean, boxplot_acceleration_mean_after, nrow = 
 
 ```
 
-
-
 # 4. Cluster
 
 ```{r}
@@ -159,33 +158,39 @@ grid.arrange(boxplot_acceleration_mean, boxplot_acceleration_mean_after, nrow = 
 
 ```{r}
 working_dataset <- na.omit(working_dataset)
-working_dataset <- working_dataset[,-c(1,3:5)]
 
-# Drop geom
-working_dataset <- st_drop_geometry(working_dataset)
-
-working_dataset <- working_dataset[working_dataset$diff_s < 1000,]
 
 # Filter unwanted categories, such which score low accuracy mainly
 
-# Must filter:
+# Remove unwanted classes
 working_dataset <- working_dataset[working_dataset$transport_mode != "", ]
 working_dataset <- working_dataset[working_dataset$transport_mode != "Other1", ]
-
-# Reclassify data with no tag or tag not of interest in the classes to other. 
-#           ------------- Code here -----------------
-
-# Remove unwanted classes
 # working_dataset <- working_dataset[working_dataset$transport_mode != "Funicular", ]
 # working_dataset <- working_dataset[working_dataset$transport_mode != "E_Kick_Scooter", ]
 # working_dataset <- working_dataset[working_dataset$transport_mode != "Run", ]
 # working_dataset <- working_dataset[working_dataset$transport_mode != "Boat", ]
 # working_dataset <- working_dataset[working_dataset$transport_mode != "Skateboard", ]
-# working_dataset <- working_dataset[,-c(1)]
 
+# Move less relevant modes into category "other"
+working_dataset$transport_mode[working_dataset$transport_mode == "Funicular"] <- "Other"
+working_dataset$transport_mode[working_dataset$transport_mode == "E_Kick_Scooter"] <- "Other"
+working_dataset$transport_mode[working_dataset$transport_mode == "Run"] <- "Other"
+working_dataset$transport_mode[working_dataset$transport_mode == "Boat"] <- "Other"
+working_dataset$transport_mode[working_dataset$transport_mode == "Skateboard"] <- "Other"
 
 # Show class distribution
-table(working_dataset$transport_mode)
+ggplot(working_dataset) + 
+  geom_bar(aes(x = transport_mode)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Create Copy of df for getting geometry back in df
+working_dataset_copy <- working_dataset
+
+#Drop unwanted/Geom Columns
+working_dataset <- working_dataset[,-c(1,3:5)]
+working_dataset <- st_drop_geometry(working_dataset)
+
+
 ```
 
 ```{r}
@@ -213,7 +218,58 @@ table(working_dataset$transport_mode)
 
 ```
 
-# 5. support vector machine
+# 5. support vector machine (SVM)
+
+```{r}
+# Define Control 
+fitControl <- trainControl(## 10-fold CV
+                           method = "repeatedcv",
+                           number = 10,
+                           ## repeated ten times
+                           repeats = 3)
+```
+ 
+
+# 5.1 Liner SVM
+
+```{r}
+
+# Perform Linear SVM
+model.svmL <- train(transport_mode ~ ., 
+               data = TrainingSet,
+               method = "svmLinear",
+               na.action = na.omit,
+               preprocess = c("scale", "center"),
+               trControl = trainControl(method = "none"),
+               tuneGrid = data.frame(degree = 1, scale = 1, C = 1)
+               )
+
+# Perform Linear SVM with 10-fold Cross Validation
+model.svmL.cv <- train(transport_mode ~ ., 
+               data = TrainingSet,
+               method = "svmLinear",
+               na.action = na.omit,
+               preprocess = c("sclae","center"),
+               trControl = trainControl(method = "cv", number = 10),
+               TuneGrid = expand.grid(C = seq(0, 2, length = 20) # Find best Fit Model
+               ))
+
+# Show Best Tune
+(model.svmL.cv$bestTune)
+
+# Make Predictions
+model.svmL.training <- predict(model.svmL, TrainingSet)
+model.svmL.testing <- predict(model.svmL, TestingSet)
+model.svmL.cv.training <- predict(model.svmL.cv, TrainingSet)
+model.svmL.cv.testing <- predict(model.svmL.cv, TrainingSet)
+
+# Model Performance
+(model.svmL.training.confusion <- confusionMatrix(model.svmL.training, as.factor(TrainingSet$transport_mode)))
+(model.svmL.testing.confusion <- confusionMatrix(model.svmL.testing, as.factor(TestingSet$transport_mode)))
+(model.svmL.cv.training.confusion <- confusionMatrix(model.svmL.cv.training, as.factor(TrainingSet$transport_mode)))
+(model.svmL.cv.testing.confusion <- confusionMatrix(model.svmL.cv.testing, as.factor(TrainingSet$transport_mode)))
+
+```
 
 ```{r}
 set.seed(100)
@@ -224,56 +280,75 @@ TrainingIndex <- createDataPartition(working_dataset$transport_mode, p = 0.8, li
 TrainingSet <- working_dataset[TrainingIndex,]
 TestingSet <- working_dataset[-TrainingIndex,]
 
+
+
 # Build Training Model
-model <- train(transport_mode ~ ., 
+model.svm <- train(transport_mode ~ ., 
                data = TrainingSet,
                method = "svmPoly",
                na.action = na.omit,
                preprocess = c("sclae","center"),
                trControl = trainControl(method = "none"),
-               tuneGrid = data.frame(degree = 1, scale = 1, C = 1)
-               )
+               tuneGrid = data.frame(degree = 1, scale = 1, C = 1))
+               
 
-# Build CV Model
-model.cv <- train(transport_mode ~ ., 
+# Build CV Model (long processing)
+TrainingSet$transport_mode <- as.character(TrainingSet$transport_mode)
+model.svm.cv <- train(transport_mode ~ ., 
                data = TrainingSet,
                method = "svmPoly",
                na.action = na.omit,
                preprocess = c("sclae","center"),
-               trControl = trainControl(method = "cv", number = 10),
-               tuneGrid = data.frame(degree = 1, scale = 1, C = 1)
-               )
+               trControl = fitControl,
+               tuneLength = 4) # Fit Model
+               
+(model.svm.cv$bestTune)
 
 # Make Predictions
-model.training <- predict(model, TrainingSet)
-model.testing <- predict(model, TestingSet)
-model.cv <- predict(model.cv, TrainingSet)
+model.svm.training <- predict(model.svm, TrainingSet)
+model.svm.testing <- predict(model.svm, TestingSet)
+
+# Make Predictions from Cross Validation model
+model.svm.cv.training <- predict(model.svm.cv, TrainingSet)
+model.svm.cv.testing <- predict(model.svm.cv, TestingSet)
 
 # Model Performance
-(model.training.confusion <- confusionMatrix(model.training, as.factor(TrainingSet$transport_mode)))
-(model.testing.confusion <- confusionMatrix(model.testing, as.factor(TestingSet$transport_mode)))
-(model.cv.confusion <- confusionMatrix(model.cv, as.factor(TrainingSet$transport_mode)))
+(model.svm.training.confusion <- confusionMatrix(model.svm.training, as.factor(TrainingSet$transport_mode)))
+(model.svm.testing.confusion <- confusionMatrix(model.svm.testing, as.factor(TestingSet$transport_mode)))
+(model.svm.cv.confusion <- confusionMatrix(model.svm.cv.training, as.factor(TrainingSet$transport_mode)))
+(model.svm.cv.testing.confusion <- confusionMatrix(model.svm.cv.testing, as.factor(TestingSet$transport_mode)))
 
-
+print(model.svm)
+print(model.svm.cv)
 ```
 
 ```{r}
+
+set.seed(101)
 # Run Model on full dataset
-model.final <- predict(model, working_dataset)
-model.final.confusion <- confusionMatrix(model.final, as.factor(working_dataset$transport_mode))
+model.svm.final <- predict(model.svm.cv, working_dataset)
+model.svm.final.confusion <- confusionMatrix(model.svm.final, as.factor(working_dataset$transport_mode))
 
 # Save and Print final model confusion matrix
 (model.final.table <- model.final.confusion[[2]])
+
+colnames <- colnames(working_dataset)
 
 working_dataset_result <- data.frame(working_dataset, model.final)
 working_dataset_result <- left_join(working_dataset_result, working_dataset_copy, 
                                     by = c("transport_mode","diff_s","diff_s_mean","angle","sinuosity","steplength","step_mean","velocity", "acceleration","acceleration_mean","velocity_mean"))
 
+write.csv(working_dataset_result, "data/working_dataset_result.csv", row.names = F)
+
 ```
 
+
 ```{r}
+
+working_dataset_result <- read.delim("data/working_dataset_result.csv", sep=",", header = T) 
+
 working_dataset_result <- working_dataset_result %>%
-    st_as_sf(coords = c("longitude", "latitude"), crs = 2056) 
+    st_as_sf(coords = c("longitude", "latitude"), crs = 4326) 
 
 map <- mapview(working_dataset_result, 
                zcol = "transport_mode", 
@@ -289,6 +364,7 @@ map
 ```{r Accuracy}
 
 # Confusion Matrix
+# Note: Only works if result and working dataset have identical transport modes as factors.
 (conf_matrix <- confusionMatrix(as.factor(working_dataset_result$transport_mode), working_dataset_result$model.final))
 
 # Precision for each class
@@ -314,28 +390,16 @@ It is useful when the goal is to minimize false negatives.
 F1-Score: The F1-score combines precision and recall into a single metric.
 It provides a balance between precision and recall and is useful when both false positives and false negatives are important.
 
-```{r}
-# Confusion Matrix for new results
-(conf_matrix_2 <- confusionMatrix(as.factor(working_dataset_result$transport_mode), working_dataset_result$model.final))
 
-# Precision for each class
-(precision_2 <- conf_matrix_2$byClass[, "Precision"])
 
-# Recall for each class
-(recall_2 <- conf_matrix_2$byClass[, "Recall"])
-
-# F1-Score for each class
-(f1_score_2 <- conf_matrix_2$byClass[, "F1"])
-```
-
-# K-Means
+# Space for another model
 
 ```{r}
 
 
 model.kmeans <- train(transport_mode ~ ., 
                data = TrainingSet,
-               method = "kmeans",
+               method = "",
                na.action = na.omit,
                preprocess = c("scale", "center"),
                trControl = trainControl(method = "none"),
@@ -345,7 +409,7 @@ model.kmeans <- train(transport_mode ~ .,
 # Build CV Model
 model.kmeans.cv <- train(transport_mode ~ ., 
                data = TrainingSet,
-               method = "kmeans",
+               method = "",
                na.action = na.omit,
                preprocess = c("sclae","center"),
                trControl = trainControl(method = "cv", number = 10),
@@ -373,42 +437,42 @@ model.kmeans.cv <- predict(model.kmeans.cv, TrainingSet)
 # Neural Net
 
 ```{r CNN}
-set.seed(100)
-
-# BUild CNN Model
-model.cnn <- train(transport_mode ~ ., 
-               data = TrainingSet,
-               method = "avNNet",
-               na.action = na.omit,
-               preprocess = c("scale", "center"),
-               trControl = trainControl(method = "cv", number = 10),
-               tuneGrid = data.frame(size = 1, decay = 0.1, bag = 100),
-               tuneLength = 10,  # Increase the tuneLength to explore more architectures
-               pool = list(pool = c(2, 2)),
-               convolve = list(kernel = c(3, 3), kernel = c(5, 5))  # Change filter sizes
-               )
-
-model.cnn.cv <- train(transport_mode ~ ., 
-               data = TrainingSet,
-               method = "avNNet",
-               na.action = na.omit,
-               preprocess = c("scale", "center"),
-               trControl = trainControl(method = "cv", number = 10),
-               tuneGrid = data.frame(size = 1, decay = 0.1, bag = 100),
-               tuneLength = 10,  # Increase the tuneLength to explore more architectures
-               pool = list(pool = c(2, 2)),
-               convolve = list(kernel = c(3, 3), kernel = c(5, 5))  # Change filter sizes
-               )
-
-# Make Predictions
-model.cnn.training <- predict(model.cnn, TrainingSet)
-model.cnn.testing <- predict(model.cnn, TestingSet)
-model.cnn.cv <- predict(model.cnn.cv, TrainingSet)
-
-
-(model.cnn.training.confusion <- confusionMatrix(model.cnn.training, as.factor(TrainingSet$transport_mode)))
-(model.cnn.testing.confusion <- confusionMatrix(model.cnn.testing, as.factor(TestingSet$transport_mode)))
-(model.cnn.cv.confusion <- confusionMatrix(model.cnn.cv, as.factor(TrainingSet$transport_mode)))
+# set.seed(100)
+# 
+# # BUild CNN Model
+# model.cnn <- train(transport_mode ~ ., 
+#                data = TrainingSet,
+#                method = "avNNet",
+#                na.action = na.omit,
+#                preprocess = c("scale", "center"),
+#                trControl = trainControl(method = "cv", number = 10),
+#                tuneGrid = data.frame(size = 1, decay = 0.1, bag = 100),
+#                tuneLength = 10,  # Increase the tuneLength to explore more architectures
+#                pool = list(pool = c(2, 2)),
+#                convolve = list(kernel = c(3, 3), kernel = c(5, 5))  # Change filter sizes
+#                )
+# 
+# model.cnn.cv <- train(transport_mode ~ ., 
+#                data = TrainingSet,
+#                method = "avNNet",
+#                na.action = na.omit,
+#                preprocess = c("scale", "center"),
+#                trControl = trainControl(method = "cv", number = 10),
+#                tuneGrid = data.frame(size = 1, decay = 0.1, bag = 100),
+#                tuneLength = 10,  # Increase the tuneLength to explore more architectures
+#                pool = list(pool = c(2, 2)),
+#                convolve = list(kernel = c(3, 3), kernel = c(5, 5))  # Change filter sizes
+#                )
+# 
+# # Make Predictions
+# model.cnn.training <- predict(model.cnn, TrainingSet)
+# model.cnn.testing <- predict(model.cnn, TestingSet)
+# model.cnn.cv <- predict(model.cnn.cv, TrainingSet)
+# 
+# 
+# (model.cnn.training.confusion <- confusionMatrix(model.cnn.training, as.factor(TrainingSet$transport_mode)))
+# (model.cnn.testing.confusion <- confusionMatrix(model.cnn.testing, as.factor(TestingSet$transport_mode)))
+# (model.cnn.cv.confusion <- confusionMatrix(model.cnn.cv, as.factor(TrainingSet$transport_mode)))
 
 ```
 
@@ -430,31 +494,43 @@ count <- 0
 for (i in 1:nrow(working_dataset_result)) {
   current_value <- working_dataset_result$model.final[i]
   for (j in 1:x) {
-      if (j >= x) {
-        previous_values <- working_dataset_result$model.final[(i - x):(i - 1)]
-        if (all(previous_values == current_value)) {
-            working_dataset_result$model.final[(i - x + 1):i] <- current_value
+    
+    # Find x-Previous & -Following Values before point i
+    previous_values <- working_dataset_result$model.final[(i - x):(i - 1)]
+    following_values <- working_dataset_result$model.final[(i + 1):(i + x)]
+        
+    # Check if all previous & following values are equal and are different from current value
+    if (all(previous_values == following_values && previous_values != current_value && previous_values != currentvalue)) {
+            print(i)  
+          #working_dataset_result$model.final[(i - x + 1):i] <- current_value
     }
   }
-  # Check previous x points
-
-  }
-       # Check following x points, does not work :(
-
-       if (i <= (nrow(working_dataset_result) - x + 1)) {
-         following_values <- working_dataset_result$model.final[(i + 1):(i + x)]
-         if (all(following_values == current_value)) {
-          working_dataset_result$model.final[i:(i + x - 1)] <- current_value
-        }
-      }
 }
+
 
 print(count)
 
 ```
 
+```{r}
+# Confusion Matrix for new results
+(conf_matrix_2 <- confusionMatrix(as.factor(working_dataset_result$transport_mode), working_dataset_result$model.final))
+
+# Precision for each class
+(precision_2 <- conf_matrix_2$byClass[, "Precision"])
+
+# Recall for each class
+(recall_2 <- conf_matrix_2$byClass[, "Recall"])
+
+# F1-Score for each class
+(f1_score_2 <- conf_matrix_2$byClass[, "F1"])
+```
 
 # 6. Evaluation
 
 # Visualisation
+
+# Literature
+
+https://findingspress.org/article/14520-classifying-transport-mode-from-global-positioning-systems-and-accelerometer-data-a-machine-learning-approach
 

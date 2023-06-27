@@ -473,7 +473,6 @@ standardized <- working_dataset_copy[, 6:15] %>%
   scale(center = TRUE, scale = TRUE) %>%
   as.data.frame()
 
-
 corr_matrix <- cor(standardized)
 ggcorrplot(corr_matrix)
 
