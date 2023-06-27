@@ -138,12 +138,22 @@ posmo_pool_3 <- read.delim("data/manually_labelled/posmo_BuJa.csv",sep=",")
 ```
 
 ```{r read context data}
+tram_netz <- read_sf("data/tlm_oev_eisenbahn/tlm_oev_eisenbahn_tram.shp") %>%
+  select(id, geometry) %>% st_zm() %>% st_buffer(10) %>% st_union
+zug_netz <- read_sf("data/tlm_oev_eisenbahn/tlm_oev_eisenbahn_bahn.shp") %>% 
+  select(id, geometry) %>% st_zm() %>% st_buffer(10) %>% st_union
+gewaesser <- read_sf("data/tlm_bb_gewaesser/tlm_bb_gewaesser_larger20000.shp") %>% 
+  select(id, geometry) %>% st_zm() %>% st_union
+strassen <- read_sf("data/tlm_strassen/strassen_AOI.shp") %>% 
+  select(id, geometry) %>% st_zm() %>% st_buffer(10) %>% st_union
 
-#zvv_sbahn <- st_read("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_S_BAHN_LINIEN_L") 
+bus_netz_zvv <- read_sf("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_LINIEN_L")
+bus_netz_zvv <- bus_netz_zvv[grepl("bus|Bus", bus_netz_zvv$BETRIEBSZWEIG_TXT), ] %>% rename(geometry = geom) %>%
+  select(geometry) %>% st_buffer(10) %>% st_union()
 
-#zvv_tram_bus <- st_read("data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg", layer="ZVV_LINIEN_GEN_L") 
+bus_netz_bern <- read_sf("data/geoinformation_bern/OEVTP_LINIE.shp") %>% filter(VERKMITT_B == "Bus") %>% select(geometry) %>%st_zm() %>% st_buffer(10) %>% st_union()
 
-#seen <- read_sf("data/gewaesser.shp")
+bus_netz <- st_union(bus_netz_bern, bus_netz_zvv)
 ```
 
 ## 1.2.1 Clean and preprocess data
@@ -420,13 +430,37 @@ posmo_pool <- rbind(processed_2,processed_3,processed_4)
 ```
 
 
-### 1.4.5 Closeness to Traffic Network
+### 1.4.5 Closeness to Traffic Network and Water Bodies
+```{r}
+data_AOI <- st_buffer(working_dataset, 50) %>% st_union()
 
-### 1.4.6 Water Bodies (For boats)
+tram_netz_AOI <- st_intersection(tram_netz, data_AOI)
+working_dataset$distance_tram <- as.numeric(st_distance(working_dataset, tram_netz_AOI))
+working_dataset$distance_tram <- ifelse(working_dataset$distance_tram > 100, 100, working_dataset$distance_tram)
 
-### 1.4.7 Slope?
 
-### 1.4.8 Average Distance between points in section
+zug_netz_AOI <- st_intersection(zug_netz, data_AOI)
+working_dataset$distance_zug <- as.numeric(st_distance(working_dataset, zug_netz_AOI))
+working_dataset$distance_zug <- ifelse(working_dataset$distance_zug > 100, 100, working_dataset$distance_zug)
+
+
+gewaesser_AOI <- st_intersection(gewaesser, data_AOI)
+working_dataset$distance_gewaesser <- as.numeric(st_distance(working_dataset, gewaesser_AOI))
+working_dataset$distance_gewaesser <- ifelse(working_dataset$distance_gewaesser > 100, 100, working_dataset$distance_gewaesser)
+
+
+bus_netz_AOI <- st_intersection(bus_netz, data_AOI)
+working_dataset$distance_bus <- as.numeric(st_distance(working_dataset, bus_netz_AOI))
+working_dataset$distance_bus <- ifelse(working_dataset$distance_bus > 100, 100, working_dataset$distance_bus)
+
+
+working_dataset$distance_strasse <- as.numeric(st_distance(working_dataset, strassen))
+working_dataset$distance_strasse <- ifelse(working_dataset$distance_strasse > 100, 100, working_dataset$distance_strasse)
+```
+
+### 1.4.6 Slope?
+
+### 1.4.7 Average Distance between points in section
 
 ### Further Parameters!
 
