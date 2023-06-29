@@ -19,12 +19,19 @@ working_dataset <- read.delim("data/full_working_dataset.csv",sep=",", header = 
 
 ## Point Parameters
 
-```{r}
+```{r, warning = F}
 
 boxplot_diff_s <- ggplot(working_dataset, aes(x = transport_mode, y = diff_s)) +
   geom_boxplot() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   ylab("sample interval [s]")
+
+plot_diff_s <- ggplot(working_dataset) + 
+  geom_line(aes(x = id, y = diff_s,colour = transport_mode)) + 
+  xlim(c(0,1000)) + # Subset of id 1 to 1000
+  ylim(c(0,120)) +
+  ylab("sample interval [s]")
+
 
 # Set threshold for parameters
 working_dataset <- working_dataset[working_dataset$diff_s < 60,]
@@ -34,11 +41,21 @@ boxplot_diff_s_after <- ggplot(working_dataset, aes(x = transport_mode, y = diff
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   ylab("sample interval [s]")
 
+plot_diff_s_after <- ggplot(working_dataset) + 
+  geom_line(aes(x = id, y = diff_s,colour = transport_mode)) + 
+  xlim(c(0,1000)) + # Subset of id 1 to 1000
+  ylab("sample interval [s]")
+
 # Display the plots side by side
-grid.arrange(boxplot_diff_s, boxplot_diff_s_after, nrow = 1)
+grid.arrange(boxplot_diff_s, boxplot_diff_s_after, nrow = 2)
+grid.arrange(plot_diff_s,plot_diff_s_after, nrow = 2)
+
 ```
 
-We remove all samples with a sampling interval larger than 5 minutes (600 seconds). We believe that at such large sampling intervals the calculated movement parameters become highly inaccurate and unrepresentative of the transport mode. This decision is based on assumptions and was not analysed in depth. We used the given tracking infrastructure by the posmo app set to a sampling interval of 10 seconds. We found the sampling interval to be highly inconsistent, with many samples having larger intervals and some being as short as 5 seconds. Fixing this issue or developing a method to handle this issue is beyond the scope of this project.
+We remove all samples with a sampling interval larger than 5 minutes (600 seconds). We believe that at such large sampling intervals the calculated movement parameters become highly inaccurate and unrepresentative of the transport mode. This decision is based on assumptions and was not analysed in depth. We used the given tracking infrastructure by the posmo app set to a sampling interval of 10 & 15 seconds. We found the sampling interval to be highly inconsistent, with many samples having larger intervals and some being as short as 5 seconds. This is also a result of our point removal functions, which reduce angle etc.. However, If we see the line plots we find that the reduction of the sample interval down to 60 seconds gives the data a smoothing effect. Further reduction or interpolation to even out the sampling interval might improve the model results. 
+
+If so done a solution for handling large time difference between two consecutive time samples is needed. 
+
 
 ```{r visualise parameters}
 
