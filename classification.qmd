@@ -529,7 +529,7 @@ map
 
 # Confusion Matrix
 # Note: Only works if result and working dataset have identical transport modes as factors.
-(conf_matrix <- confusionMatrix(working_dataset_result$transport_mode, working_dataset_result$model.final))
+(conf_matrix <- confusionMatrix(as.factor(working_dataset_result$transport_mode), as.factor(working_dataset_result$model.final)))
 
 # Precision for each class
 (precision <- conf_matrix$byClass[, "Precision"])
