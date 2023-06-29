@@ -21,7 +21,6 @@ output: html
 # echo: false           hides the code from the generated output
 # warning: false        hides warnings from the generated output
 # message: false        hides messages from the generated output
-
 # To apply the setting for all code chunks, add the options to the yaml header of the document (in between the ---) without the preceeding "#|".
 
 ```
@@ -428,6 +427,8 @@ processed_4 <- run_all(posmo_pool_3)
 working_dataset <- rbind(working_dataset, processed_1)
 posmo_pool <- rbind(processed_2,processed_3,processed_4)
 
+
+
 ```
 
 
@@ -459,6 +460,32 @@ working_dataset$distance_strasse <- as.numeric(st_distance(working_dataset, stra
 working_dataset$distance_strasse <- ifelse(working_dataset$distance_strasse > 100, 100, working_dataset$distance_strasse)
 ```
 
+```{r}
+data_AOI <- st_buffer(posmo_pool, 50) %>% st_union()
+
+tram_netz_AOI <- st_intersection(tram_netz, data_AOI)
+posmo_pool$distance_tram <- as.numeric(st_distance(posmo_pool, tram_netz_AOI))
+posmo_pool$distance_tram <- ifelse(posmo_pool$distance_tram > 100, 100, posmo_pool$distance_tram)
+
+
+zug_netz_AOI <- st_intersection(zug_netz, data_AOI)
+posmo_pool$distance_zug <- as.numeric(st_distance(posmo_pool, zug_netz_AOI))
+posmo_pool$distance_zug <- ifelse(posmo_pool$distance_zug > 100, 100, posmo_pool$distance_zug)
+
+
+gewaesser_AOI <- st_intersection(gewaesser, data_AOI)
+posmo_pool$distance_gewaesser <- as.numeric(st_distance(posmo_pool, gewaesser_AOI))
+posmo_pool$distance_gewaesser <- ifelse(posmo_pool$distance_gewaesser > 100, 100, posmo_pool$distance_gewaesser)
+
+
+bus_netz_AOI <- st_intersection(bus_netz, data_AOI)
+posmo_pool$distance_bus <- as.numeric(st_distance(posmo_pool, bus_netz_AOI))
+posmo_pool$distance_bus <- ifelse(posmo_pool$distance_bus > 100, 100, posmo_pool$distance_bus)
+
+
+posmo_pool$distance_strasse <- as.numeric(st_distance(posmo_pool, strassen))
+posmo_pool$distance_strasse <- ifelse(posmo_pool$distance_strasse > 100, 100, posmo_pool$distance_strasse)
+```
 ### 1.4.6 Slope?
 
 ### 1.4.7 Average Distance between points in section
@@ -473,6 +500,9 @@ working_dataset$distance_strasse <- ifelse(working_dataset$distance_strasse > 10
 
 working_dataset$sinuosity[is.infinite(working_dataset$sinuosity)] <- NA
 working_dataset <- na.omit(working_dataset)
+
+posmo_pool$sinuosity[is.infinite(posmo_pool$sinuosity)] <- NA
+posmo_pool <- na.omit(posmo_pool)
 
 velocity_plot <- ggplot(working_dataset, aes(id,velocity)) +
   geom_point() +
