@@ -11,8 +11,6 @@ format:
     csl: chicago-fullnote.csl
 ---
 
-<!-- You can add  your R Code with Code chunks-->
-
 ```{r}
 #| echo: false
 #| warning: false
@@ -21,8 +19,7 @@ format:
 # echo: false           hides the code from the generated output
 # warning: false        hides warnings from the generated output
 # message: false        hides messages from the generated output
-# To apply the setting for all code chunks, add the options to the yaml header of the document (in between the ---) without the preceeding "#|".
-
+# To apply the setting for all code chunks, add the options to the yaml header of the document (in between the ---) without the preceeding
 ```
 
 ## Abstract
@@ -33,13 +30,9 @@ This project aims to investigate key factors and features in GPS tracking data t
 
 In recent years, the spread of GPS-enabled devices and progress in location-based technologies have generated vast amounts of GPS tracking data. This data holds large significant potential for extracting insights and to improve our understanding of human mobility patterns. One main application in this field is the differentiation of transportation modes. This can benefit various domains such as traffic management or urban planning. Determining the mode of transportation from GPS tracking data presents several challenges. With the ubiquitous increase of GPS tracking through smartphones and other technical devices, it's too time consuming and expensive to manually annotate data and also prone to human error or biases. This leads to the following two research questions:
 
-<span style="color:#007090;"> 
-**What are the key factors and features that can be extracted from GPS tracking data to differentiate between different types of transportation modes?**
-</span>
+[ **What are the key factors and features that can be extracted from GPS tracking data to differentiate between different types of transportation modes?** ]{style="color:#007090;"}
 
-<span style="color:#007090;"> 
-**How can machine learning techniques be applied to GPS tracking data to automate the detection of the mode of transportation and which accuracies can be achieved by different machine learning algorithms?**
-</span>
+[ **How can machine learning techniques be applied to GPS tracking data to automate the detection of the mode of transportation and which accuracies can be achieved by different machine learning algorithms?** ]{style="color:#007090;"}
 
 The project will focus on exploring spatial and temporal aspects to extract key factors from GPS tracking data, such as velocity, sinuosity or angles. Additionally, spatial context in the form of traffic networks and land cover is added to the data in order to improve the accuracy of transportation mode detection. Machine learning algorithms will be tested and employed to automate the classification of transportation modes. An accurate algorithm is aimed to be found by training and evaluating different models on labeled data. These models include random forests, support vector machines or neural networks. To ensure the accuracy of the models, a subset of the classified data is used to validate the performance. By comparing the results of the automated classification with ground truth data, the project aims to assess the achieved accuracies of different machine learning algorithms and identify areas for improvement.
 
@@ -47,19 +40,17 @@ The project will focus on exploring spatial and temporal aspects to extract key 
 
 ### Data
 
-The main data are the GPS tracking data, which were recorded through the Posmos App via smartphone throughout a time span of approximately two months by the two authors. The complete collected data was manually labelled to ensure a valid ground truth. Further, spatial context data such as the Swiss road network, tram network [@swisstopo], train network [@sbb] and the bus network of the cantons of Zurich [@zvv] and Bern [@geo_bern] (Note: There is no official bus network for the entire Switzerland according to the federal bureau of transport, thus we used the available ones for Bern and Zurich, where a significant amount of data points pertaining to bus usage were collected.) To facilitate the detection of the transportation mode boat, land cover data containing all Swiss waters was also used [@swisstopo].
+The main data are the GPS tracking data, which were recorded through the Posmos App via smartphone throughout a time span of approximately two months by the two authors. The complete collected data was manually labelled to ensure a valid ground truth. Further, spatial context data such as the Swiss road network, tram network [@swisstopo], train network [@sbb] and the bus network of the cantons of Zurich [@zvv] and Bern [@geo_bern]. (Note: There is no official bus network for the entire Switzerland according to the federal bureau of transport, thus the available ones for Bern and Zurich were used, where a significant amount of data points pertaining to bus usage were collected). To facilitate the detection of the transportation mode boat, land cover data containing all Swiss waters was also used [@swisstopo].
 
 ### Preprocessing
 
-When tracking a person throughout the day using GPS data, there are instances where the person appears to be stationary, such as when in an office or at a university. However, due to GPS inaccuracies, these stationary points may not appear at the exact same location and can exhibit erratic movement patterns. The accuracy of GPS signals is often compromised in dense buildings, amplifying this phenomenon. As a result, parameters like velocity and step length can show values that are typically associated with other categories. To address this issue, two approaches have been employed.
+When tracking a person throughout the day using GPS data, there are instances where the person appears to be stationary, such as when in an office or at a university. However, due to GPS inaccuracies, these stationary points may not appear at the exact same location and can exhibit erratic movement patterns. The accuracy of GPS signals is often compromised in dense buildings, amplifying this phenomenon. Figure XXX (screen noch machen) shows an example of this phenomenon around the Irchel campus of the University of Zurich. As a result, parameters like velocity and step length can show values that are typically associated with other categories. To address this issue, two approaches have been employed. 
 
-The first approach involves analyzing the angles between consecutive points. Typically, these angles are significantly smaller for stationary points compared to other movements. By visually determining a threshold angle (X), the dataset is filtered to remove all data points with angles smaller than X. This process needs to be repeated iteratively until no angles below the threshold remain, as the removal of data points alters the angles between the remaining points.
+The first approach involves analyzing the angles between consecutive points. Typically, these angles are significantly smaller for stationary points compared to other movements. By visually determining a threshold angle (X), the dataset is filtered to remove all data points with angles smaller than X. This process needs to be repeated iteratively until no angles below the threshold remain, as the removal of data points alters the angles between the remaining points. Figure XXX (screen noch machen) shows several iterations, removing more and more points with an angle below the threshold. One problem of this approach is that in some cases small angles can also emerge naturally and not due to an error. These points are then falsely removed. There is a special case of this problem in the context of a U-turn or a sharp change in direction, the angle between the points just before and after the turn may indeed be small. Consequently, the removal of these points leads to a re-calculation of angles, which can result in the subsequent removal of additional points and the loss of significant segments. Figure XXX demonstrates this phenomenon. However, through visual inspection of a representative amount of data, this only occurs rarely.
 
-The second approach considers the distance between the current point and a set number (X) of preceding and consecutive points. A point is deemed static if the maximum distance between that point and any of the X preceding or consecutive points exceeds a predefined threshold (X). However, this approach may unintentionally remove non-static data points, particularly when a person is walking slowly and numerous data points are recorded within a small distance. Adjusting the distance threshold or the number of preceding and consecutive points can mitigate this issue, but it requires striking a balance between filtering out false movements and retaining genuine data.
+The second approach considers the distance between the current point and a set number of preceding and consecutive points. A point is deemed static if the maximum distance between that point and any of the set number of preceding or consecutive points exceeds a predefined distance threshold. However, this approach may unintentionally remove non-static data points, particularly when a person is walking slowly and numerous data points are recorded within a small distance. Adjusting the distance threshold or the number of preceding and consecutive points can mitigate this issue, but it requires striking a balance between filtering out false movements and retaining genuine data. The sampling rate of Posmos was set to 15 seconds, but in some cases, data points were recorded every three seconds. Obviously, this enhances the the chances of removing data in the just described way. Since this behavior was not expected and only discovered late in the process, the point exhibiting an abnormally short sampling interval were not removed prior to preprocessing.
 
-Finding the optimal compromise between these filtering approaches involves considering the specific characteristics of the tracked person's movements and the quality of the GPS data. By iteratively applying the angle-based filtering and analyzing the distance to surrounding points, a more accurate identification of stationary periods can be achieved, mitigating the impact of GPS inaccuracies and preserving the integrity of the tracking data.
-
-
+Finding the optimal compromise between these filtering approaches involves considering the specific characteristics of the tracked person's movements and the quality of the GPS data. By iteratively applying the angle-based filtering and analyzing the distance to surrounding points, a more accurate identification of stationary periods can be achieved, mitigating the impact of GPS inaccuracies and preserving the integrity of the tracking data. Thus, the thresholds were set by trial and error.
 
 ```{r, warning = F}
 library("dplyr")
@@ -78,7 +69,7 @@ library("ROSE")
 library("gridExtra")
 ```
 
-## supporting functions
+#### supporting functions
 
 ```{r}
 custom_mapview <- function(sf_object){
@@ -124,10 +115,9 @@ posmo_micha_csv <- read.delim("data/posmo_labelled/posmo_20230502_to_20230613_p.
 
 
 # From data pool
-posmo_pool_1 <- read.delim("data/manually_labelled/posmo.csv",sep=",") 
+posmo_pool_1 <- read.delim("data/manually_labelled/posmo.csv",sep=",") %>% tail(612) # last 250 data points are not correctly labelled
 posmo_pool_2 <- read.delim("data/manually_labelled/posmo_2.csv",sep=",") 
 posmo_pool_3 <- read.delim("data/manually_labelled/posmo_BuJa.csv",sep=",") 
-
 ```
 
 ```{r read context data}
@@ -182,6 +172,16 @@ process_posmo_data <- function(posmo_data) { # function with preprocessing steps
 # posmo_micha_truth <- process_posmo_data(posmo_micha_truth_csv)
 # posmo_cyril_truth <- process_posmo_data(posmo_cyril_truth_csv)
 # posmo_micha <-  process_posmo_data(posmo_micha_csv)
+```
+
+```{r}
+pool_sf1 <- process_posmo_data(posmo_pool_1)
+pool_sf2 <- process_posmo_data(posmo_pool_2)
+pool_sf3 <- process_posmo_data(posmo_pool_3)
+
+mapview(tail(pool_sf1, 612), zcol="transport_mode")
+mapview(tail(pool_sf2, 20000), zcol="transport_mode") 
+mapview(pool_sf3, zcol="transport_mode")
 ```
 
 ```{r working datasets}
@@ -399,6 +399,8 @@ run_all <- function(df){
 
 ```{r combine data}
 
+
+
 working_dataset <- run_all(posmo_micha_truth_csv)
 processed_1 <- run_all(posmo_cyril_truth_csv)
 processed_2 <- run_all(posmo_pool_1)
@@ -539,27 +541,706 @@ write.csv(working_dataset, file = "data/full_working_dataset.csv", row.names = F
 write.csv(posmo_pool, file = "data/full_posmo_pool_dataset.csv", row.names = F)
 ```
 
-## Results
+# Class Distribution Overview
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce semper maximus urna, ut aliquet massa hendrerit sed. Ut sed nisi non tellus placerat lacinia vitae nec ipsum. Nulla ut nisl non ex auctor pharetra. In efficitur mi non nibh malesuada, eu dapibus est cursus. Nulla feugiat nisi metus, eget laoreet elit congue non. Nam et mauris sed leo tincidunt fermentum ac at leo. Morbi tincidunt vestibulum turpis, nec consectetur dolor placerat a. Integer dapibus, est sit amet tincidunt pellentesque, elit elit sagittis erat, nec rutrum est nunc ut libero.
+```{r load data}
+working_dataset <- read.delim("data/full_working_dataset.csv",sep=",", header = T) 
+posmo_pool <- read.delim("data/full_posmo_pool_dataset.csv",sep=",", header = T) 
 
-Phasellus lobortis purus eu purus fermentum, vitae mattis nunc malesuada. Aliquam semper mauris eget nisl fringilla, eget feugiat nulla viverra. Vestibulum vestibulum nisi a purus pellentesque, et tincidunt nisl pulvinar. Mauris id rutrum lorem. Etiam cursus efficitur nisl, vel finibus turpis aliquam ac. Cras in est sit amet tortor tincidunt efficitur. Maecenas ac est bibendum, pharetra neque a, consectetur nisi. Maecenas ultrices ultricies ipsum id ullamcorper. Donec fringilla sem eu tortor dictum ullamcorper.
+working_dataset <- rbind(working_dataset, posmo_pool)
 
-Vestibulum varius nunc et eleifend sollicitudin. Maecenas facilisis urna quis sapien bibendum, et gravida sem rutrum. Nam accumsan tortor sit amet turpis dapibus, et varius ligula pharetra. Mauris consectetur, arcu auctor ullamcorper finibus, justo massa convallis purus, in eleifend lectus felis in odio. Sed efficitur mi ac felis facilisis aliquam. Aliquam consequat sem ut augue vulputate viverra. In nec fringilla sapien. Donec sit amet pharetra turpis. Curabitur vel tellus sed odio ultrices volutpat a at lacus.
+working_dataset <- na.omit(working_dataset)
+# Show class distribution
+ggplot(working_dataset) + 
+  geom_bar(aes(x = transport_mode)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle("Class Distribution over Unfiltered Data Set") +
+  xlab("Transport Mode") + ylab("Count")
+```
 
-Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Curabitur placerat dui ut vestibulum malesuada. Duis lobortis ipsum a commodo tincidunt. Fusce eu elit id risus dapibus feugiat. Vivamus eget fringilla nisl. Nullam suscipit massa ut dapibus efficitur. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nec diam rutrum, pulvinar libero sit amet, viverra justo. Sed efficitur magna eget risus luctus, vel feugiat quam varius. Morbi finibus justo nec ex semper, ut gravida mauris vulputate.
+From the distribution we can see that many classes are very poorly represented in the data. Unclassified data is removed and aggregated. The underrepresented transport modes are moved to the class "Other".
 
-Nullam mollis elementum metus ac congue. Fusce porttitor sem quis augue fermentum, id tempus leo bibendum. Nam malesuada justo quis consectetur tristique. Nullam ullamcorper enim ut faucibus aliquam. Donec et purus urna. Pellentesque sed neque elit. Mauris commodo dui eget dui tempor dictum. Nulla facilisi. Quisque venenatis sollicitudin est, vel tristique lacus gravida ac. Sed vehicula nibh id libero commodo interdum.
+```{r filter classes}
+# Remove unwanted classes
+working_dataset <- working_dataset[working_dataset$transport_mode != "", ]
+working_dataset <- working_dataset[working_dataset$transport_mode != "Other1", ]
+# working_dataset <- working_dataset[working_dataset$transport_mode != "Funicular", ]
+# working_dataset <- working_dataset[working_dataset$transport_mode != "E_Kick_Scooter", ]
+# working_dataset <- working_dataset[working_dataset$transport_mode != "Run", ]
+# working_dataset <- working_dataset[working_dataset$transport_mode != "Boat", ]
+# working_dataset <- working_dataset[working_dataset$transport_mode != "Skateboard", ]
 
-## Discussion
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce semper maximus urna, ut aliquet massa hendrerit sed. Ut sed nisi non tellus placerat lacinia vitae nec ipsum. Nulla ut nisl non ex auctor pharetra. In efficitur mi non nibh malesuada, eu dapibus est cursus. Nulla feugiat nisi metus, eget laoreet elit congue non. Nam et mauris sed leo tincidunt fermentum ac at leo. Morbi tincidunt vestibulum turpis, nec consectetur dolor placerat a. Integer dapibus, est sit amet tincidunt pellentesque, elit elit sagittis erat, nec rutrum est nunc ut libero.
+# Move less relevant modes into category "other"
+working_dataset$transport_mode[working_dataset$transport_mode == "Funicular"] <- "Other"
+working_dataset$transport_mode[working_dataset$transport_mode == "E_Kick_Scooter"] <- "Other"
+working_dataset$transport_mode[working_dataset$transport_mode == "Run"] <- "Other"
+working_dataset$transport_mode[working_dataset$transport_mode == "Skateboard"] <- "Other"
+working_dataset$transport_mode[working_dataset$transport_mode == "Airplane"] <- "Other"
+working_dataset$transport_mode[working_dataset$transport_mode == "E_Bike"] <- "Other"
+# working_dataset$transport_mode[working_dataset$transport_mode == "Boat"] <- "Other"
 
-Phasellus lobortis purus eu purus fermentum, vitae mattis nunc malesuada. Aliquam semper mauris eget nisl fringilla, eget feugiat nulla viverra. Vestibulum vestibulum nisi a purus pellentesque, et tincidunt nisl pulvinar. Mauris id rutrum lorem. Etiam cursus efficitur nisl, vel finibus turpis aliquam ac. Cras in est sit amet tortor tincidunt efficitur. Maecenas ac est bibendum, pharetra neque a, consectetur nisi. Maecenas ultrices ultricies ipsum id ullamcorper. Donec fringilla sem eu tortor dictum ullamcorper.
+# Show class distribution
+classes <- ggplot(working_dataset) + 
+  geom_bar(aes(x = transport_mode)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_hline(yintercept = 500, colour = "red", linetype = "dashed") +
+  ggtitle("Class Distribution over Redistributed Data Set") +
+  xlab("Transport Mode") + ylab("Count")
 
-Vestibulum varius nunc et eleifend sollicitudin. Maecenas facilisis urna quis sapien bibendum, et gravida sem rutrum. Nam accumsan tortor sit amet turpis dapibus, et varius ligula pharetra. Mauris consectetur, arcu auctor ullamcorper finibus, justo massa convallis purus, in eleifend lectus felis in odio. Sed efficitur mi ac felis facilisis aliquam. Aliquam consequat sem ut augue vulputate viverra. In nec fringilla sapien. Donec sit amet pharetra turpis. Curabitur vel tellus sed odio ultrices volutpat a at lacus.
+classes
+table(working_dataset$transport_mode)
+```
 
-Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Curabitur placerat dui ut vestibulum malesuada. Duis lobortis ipsum a commodo tincidunt. Fusce eu elit id risus dapibus feugiat. Vivamus eget fringilla nisl. Nullam suscipit massa ut dapibus efficitur. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nec diam rutrum, pulvinar libero sit amet, viverra justo. Sed efficitur magna eget risus luctus, vel feugiat quam varius. Morbi finibus justo nec ex semper, ut gravida mauris vulputate.
+The dotted red line lies at a count of 500, representing the desired sample count for the following under sampling of our data set.
 
-Nullam mollis elementum metus ac congue. Fusce porttitor sem quis augue fermentum, id tempus leo bibendum. Nam malesuada justo quis consectetur tristique. Nullam ullamcorper enim ut faucibus aliquam. Donec et purus urna. Pellentesque sed neque elit. Mauris commodo dui eget dui tempor dictum. Nulla facilisi. Quisque venenatis sollicitudin est, vel tristique lacus gravida ac. Sed vehicula nibh id libero commodo interdum.
+# Parameter Thresholds
 
-# References
+In the following chapter we find viable thresholds for each calculated parameter and filter the data accordingly.
+
+## Sampling Interval
+
+The sampling intervals were found to be highly inconsistent. Many large sampling intervals originate from the tracked person being stationary. Therefore the sampling interval is limited to 60 seconds. No re-sampling to equalize the sampling interval is undertaken, to preserve the GPS position and the calculated parameters for each data point, since with large sampling intervals the calculated movement parameters become inaccurate and unrepresentative of the transport mode. After applying the threshold the actual sampling interval of 10, respective 15 seconds can be seen in the box plot.
+
+```{r, warning = F}
+
+boxplot_diff_s <- ggplot(working_dataset,aes(x = transport_mode, y = diff_s)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("sample interval [s]") + xlab("Transport Mode") +
+  ggtitle("Sample Interval per Class")
+
+# Set threshold for parameters
+working_dataset <- working_dataset[working_dataset$diff_s < 60,]
+
+boxplot_diff_s_after <- ggplot(working_dataset, aes(x = transport_mode, y = diff_s)) + 
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("sample interval [s]") + xlab("Transport Mode") +
+  ggtitle("Sample Interval per Class \nAfter Threshold")
+
+# Display the plots side by side
+grid.arrange(boxplot_diff_s, boxplot_diff_s_after, nrow = 1)
+
+```
+
+## Moving Window Sampling Interval
+
+After the initial removal of sampling intervals larger than 60 seconds we repeat the step for the moving window sampling intervals.
+
+```{r}
+
+boxplot_diff_s_mean <- ggplot(working_dataset, aes(x = transport_mode, y = diff_s_mean)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("sample intervall [s]")
+
+# Set threshold for parameters
+working_dataset <- working_dataset[working_dataset$diff_s_mean < 60,]
+
+boxplot_diff_s_mean_after <- ggplot(working_dataset, aes(x = transport_mode, y = diff_s_mean)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("sample intervall [s]")
+
+# Display the plots side by side
+grid.arrange(boxplot_diff_s_mean, boxplot_diff_s_mean_after, nrow = 1)
+
+```
+
+## Velocity
+
+The velocity attribute shows some outliers for the train class and walking class. The threshold for maximum velocity is set to 55.55 m/s (200km/h ), as no transport mode in our analysis is expected to exceed such velocity. One exception are airplanes, but with only very few data points there is no benefit in including higher velocities. After setting the threshold some obvious outliers remain for the walking class. Reasons for such outliers in the calculated velocity could be:
+
+\(1\) Wrong Classification, even though the data is verified.
+
+\(2\) GPS inaccuracies, where the GPS point location is "jumping" creating very inaccurate, zigzagging tracking data.
+
+```{r visualise parameters}
+
+boxplot_velocity <- ggplot(working_dataset, aes(x = transport_mode, y = velocity)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("velocity [m/s]") + xlab("Transport Mode") +
+  ggtitle("Velocity per Class")
+
+# Set threshold for parameters
+working_dataset <- working_dataset[working_dataset$velocity < 55.55,]
+
+boxplot_velocity_after <- ggplot(working_dataset, aes(x = transport_mode, y = velocity)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("velocity [m/s]") + xlab("Transport Mode") +
+  ggtitle("Velocity per Class After Threshold")
+
+# Display the plots side by side
+grid.arrange(boxplot_velocity, boxplot_velocity_after, nrow = 1)
+
+```
+
+## Moving Window Velocity
+
+The moving window velocity shows less extreme outliers. The number of outliers can be reduced further by removing setting the treshold to 55.5m/s (200km/h). After applying the threshold classes with similar average velocities can be identified. This might already be an indicator for classes which are difficult to distinguish using classification methods.
+
+```{r}
+
+boxplot_velocity_mean <- ggplot(working_dataset, aes(x = transport_mode, y = velocity_mean)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("moving window velocity[m/s]")
+
+# Set threshold for parameters
+working_dataset <- working_dataset[working_dataset$velocity_mean < 55.55,]
+
+boxplot_velocity_mean_after <- ggplot(working_dataset, aes(x = transport_mode, y = velocity_mean)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("moving window velocity [m/s]")
+
+# Display the plots side by side
+grid.arrange(boxplot_velocity_mean, boxplot_velocity_mean_after, nrow = 1)
+
+```
+
+## Acceleration
+
+The acceleration threshold is set to 10m/s\^2, as for this classification is considered to be the maximum possible acceleration for all classes. The distribution of the classes is similar to the velocities. In the parameter correlation analysis strong correlation between velocity and acceleration was found.
+
+```{r}
+boxplot_acceleration <- ggplot(working_dataset, aes(x = transport_mode, y = acceleration)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("acceleration [m/s^2]")
+
+# Set threshold for parameters
+working_dataset <- working_dataset[working_dataset$acceleration < 10,]
+
+boxplot_acceleration_after <- ggplot(working_dataset, aes(x = transport_mode, y = acceleration)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("acceleration [m/s^2]")
+
+# Display the plots side by side
+grid.arrange(boxplot_acceleration, boxplot_acceleration_after, nrow = 1)
+```
+
+## Moving Window Acceleration
+
+The acceleration threshold is set to 10m/s\^2, as for the single point acceleration values.
+
+```{r}
+
+boxplot_acceleration_mean <- ggplot(working_dataset, aes(x = transport_mode, y = acceleration_mean)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("moving window acceleration [m/s^2]")
+
+# Set threshold for parameters
+working_dataset <- working_dataset[working_dataset$acceleration_mean < 10,]
+
+boxplot_acceleration_mean_after <- ggplot(working_dataset, aes(x = transport_mode, y = acceleration_mean)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("moving window acceleration [m/s^2]")
+
+# Display the plots side by side
+grid.arrange(boxplot_acceleration_mean, boxplot_acceleration_mean_after, nrow = 1)
+
+```
+
+# Under Sampling
+
+The data set is strongly imbalanced. To improve model accuracy we use under sampling to balance the classes. 500 samples per class are desired. The classes "boat" and "other" do not have sufficient points. The sample size is not further decreased, so enough data is provided to train the and test the computed models.
+
+```{r}
+# Create copy for later use
+working_dataset_full <- working_dataset
+
+# Set the maximum number of entries per class
+max_entries <- 500
+
+# Perform under sampling
+working_dataset <- working_dataset |>
+  group_by(transport_mode) |>
+  sample_n(min(n(), max_entries)) |>
+  ungroup()
+
+# Check the resulting undersampled DataFrame
+table(working_dataset$transport_mode)
+
+#Drop unwanted/Geom Columns
+working_dataset <- working_dataset[,-c(1,3:5)]
+working_dataset <- st_drop_geometry(working_dataset)
+```
+
+# Classification
+
+To classify the data a Support Vector Machine (SVM) is applied. A linear SVM, radial SVM and polynomial SVM are tested. We apply a single-train-test split model and a 10 fold cross validation with 3 repeats. The cross validation improves model robustness compared to the single train-test split and reduces bias resulting in a more representative evaluation of the model performance. The tuning sequences are replaced by the best found hyper parameters for each model, to save computation time.
+
+The models are evaluated with the confusion matrix, the overall accuracy, recall, precision, and F1-Score. A confusion matrix is a table that summarizes the performance of a classification model by showing the counts of true positive, true negative, false positive, and false negative predictions. Precision measures the proportion of correctly predicted positive instances out of the total instances predicted as positive. Recall measures the proportion of correctly predicted positive instances out of the total actual positive instances. The F1-score combines precision and recall into a single metric. It provides a balance between precision and recall and is useful when both false positives and false negatives are important.
+
+```{r}
+# Define Control for 10-fold CV
+fitControl <- trainControl(## 10-fold CV
+                           method = "repeatedcv",
+                           number = 10,
+                           repeats = 3)
+```
+
+We create a training and a test data set. The training data set contains 80% of the data points and the test set contains 20% of the data points.
+
+```{r}
+
+# Convert to Factor
+working_dataset$transport_mode <- as.factor(working_dataset$transport_mode)
+
+# Create Training and Test Data Set
+TrainingIndex <- createDataPartition(working_dataset$transport_mode, p = 0.8, list = F)
+TrainingSet <- working_dataset[TrainingIndex,]
+TestingSet <- working_dataset[-TrainingIndex,]
+```
+
+# Liner SVM
+
+A linear support vector machine is tested and the performance evaluated. Different hyper parameter settings were tested to find the best model. For the linear SVM the best fit found is for C = 3 achieving an overall accuracy of 78.1%. Precision, recall and F1-score vary for the classes but average around 78-79%.
+
+```{r}
+# Set seed for reproducibility
+set.seed(100)
+
+# Perform Linear SVM
+model.svmL <- train(transport_mode ~ ., 
+               data = TrainingSet,
+               method = "svmLinear",
+               na.action = na.omit,
+               preprocess = c("scale", "center"),
+               trControl = trainControl(method = "none"),
+               tuneGrid = data.frame(C = 3),
+               )
+
+# Perform Linear SVM with 10-fold Cross Validation (Reduce Length for shorter computation time)
+model.svmL.cv <- train(transport_mode ~ ., 
+               data = TrainingSet,
+               method = "svmLinear",
+               na.action = na.omit,
+               preprocess = c("sclae","center"),
+               trControl = fitControl,
+               tuneGrid = expand.grid(C = seq(3, 6, length = 4) # Find best Fit Model
+               ))
+
+# Show Best Tune
+#print(model.svmL.cv$bestTune)
+
+# Make Predictions
+model.svmL.training <- predict(model.svmL, TrainingSet)
+model.svmL.testing <- predict(model.svmL, TestingSet)
+model.svmL.cv.training <- predict(model.svmL.cv, TrainingSet)
+model.svmL.cv.testing <- predict(model.svmL.cv, TrainingSet)
+
+# Model Performance
+model.svmL.training.confusion <- confusionMatrix(model.svmL.training, as.factor(TrainingSet$transport_mode))
+model.svmL.testing.confusion <- confusionMatrix(model.svmL.testing, as.factor(TestingSet$transport_mode))
+model.svmL.cv.training.confusion <- confusionMatrix(model.svmL.cv.training, as.factor(TrainingSet$transport_mode))
+(model.svmL.cv.testing.confusion <- confusionMatrix(model.svmL.cv.testing, as.factor(TrainingSet$transport_mode))) # Print test run with CV
+
+# Precision for each class
+cat("\nPrecision for each class:\n")
+(precision_svmL <- model.svmL.cv.testing.confusion$byClass[, "Precision"])
+cat("\nAverage Precision:\n")
+(precision_svmL <- mean(model.svmL.cv.testing.confusion$byClass[, "Precision"]))
+
+# Recall for each class
+cat("\nRecall for each class:\n")
+(recall_svmL<- model.svmL.cv.testing.confusion$byClass[, "Recall"])
+cat("\nAverage Recall:\n")
+(recall_svmL <- mean(model.svmL.cv.testing.confusion$byClass[, "Recall"]))
+
+# F1-Score for each class
+cat("\nF1-Score for each class:\n")
+(f1_score_svmL <- model.svmL.cv.testing.confusion$byClass[, "F1"])
+cat("\nAverage F1-Score:\n")
+(f1_score_svmL <- mean(model.svmL.cv.testing.confusion$byClass[, "F1"]))
+
+
+# Save the models
+saveRDS(model.svmL, "models/model_svmL.rds")
+saveRDS(model.svmL.cv, "models/model_svmL_cv.rds")
+
+```
+
+# Radial Support Vector Machine
+
+The radial SVM performs slightly better than the linear SVM with an overall accuracy of 80.92% and similar recall, precision and f1-scores. This model however performs better, since the applied metrics vary less between classes.
+
+```{r}
+# Set seed for reproduceability
+set.seed(108)
+
+# Build Training Model
+model.svmRadial <- train(transport_mode ~ .,
+                         data = TrainingSet,
+                         method = "svmRadial",
+                         na.action = na.omit,
+                         preprocess = c("scale", "center"),
+                         trControl = trainControl(method = "none"),
+                         tuneGrid = expand.grid(sigma = 0.8683492, C = 5)
+)             
+
+# Build CV Model (long processing!!!)
+TrainingSet$transport_mode <- as.character(TrainingSet$transport_mode)
+model.svmRadial.cv <- train(transport_mode ~ .,
+                            data = TrainingSet,
+                            method = "svmRadial",
+                            na.action = na.omit,
+                            preprocess = c("scale", "center"),
+                            trControl = fitControl,
+                            tuneGrid = expand.grid(sigma = 0.8683492, C = 5)
+)
+               
+(model.svmRadial.cv$bestTune)
+
+# Make Predictions
+model.svmRadial.training <- predict(model.svmRadial, TrainingSet)
+model.svmRadial.testing <- predict(model.svmRadial, TestingSet)
+
+# Make Predictions from Cross Validation model
+model.svmRadial.cv.training <- predict(model.svmRadial.cv, TrainingSet)
+model.svmRadial.cv.testing <- predict(model.svmRadial.cv, TestingSet)
+
+# Model Performance
+model.svmRadial.training.confusion <- confusionMatrix(model.svmRadial.training, as.factor(TrainingSet$transport_mode))
+model.svmRadial.testing.confusion <- confusionMatrix(model.svmRadial.testing, as.factor(TestingSet$transport_mode))
+model.svmRadial.cv.confusion <- confusionMatrix(model.svmRadial.cv.training, as.factor(TrainingSet$transport_mode))
+(model.svmRadial.cv.testing.confusion <- confusionMatrix(model.svmRadial.cv.testing, as.factor(TestingSet$transport_mode))) # Print test run with CV
+
+# Precision for each class
+cat("\nPrecision for each class:\n")
+(precision_svmRadial <- model.svmRadial.cv.testing.confusion$byClass[, "Precision"])
+cat("\nAverage Precision:\n")
+(precision_svmRadial_avg <- mean(model.svmRadial.cv.testing.confusion$byClass[, "Precision"]))
+
+# Recall for each class
+cat("\nRecall for each class:\n")
+(recall_svmRadial<- model.svmRadial.cv.testing.confusion$byClass[, "Recall"])
+cat("\nAverage Recall:\n")
+(recall_svmRadial_avg <- mean(model.svmRadial.cv.testing.confusion$byClass[, "Recall"]))
+
+# F1-Score for each class
+cat("\nF1-Score for each class:\n")
+(f1_score_svmRadial <- model.svmRadial.cv.testing.confusion$byClass[, "F1"])
+cat("\nAverage F1-Score:\n")
+(f1_score_svmRadial_avg <- mean(model.svmRadial.cv.testing.confusion$byClass[, "F1"]))
+
+# Save the models
+saveRDS(model.svmRadial, "models/model_svmRadial.rds")
+saveRDS(model.svmRadial.cv, "models/model_svmRadial_cv.rds")
+```
+
+## Polynomial SVM
+
+Out of all tested models the polynomial SVM achieved the highest overall accuracy with 83.86% and the best performance for recall, precision and F1-score. The by class performance is significantly better compared to the other models. The Cohen's Kappa value lies at 0.81 indicating high agreement between the predictions and ground truth labels. The p-value indicates that the accuracy of the polynomial SVM model is significantly better than the no information rate.
+
+```{r}
+set.seed(100)
+
+# Build Training Model
+model.svmPoly <- train(transport_mode ~ ., 
+               data = TrainingSet,
+               method = "svmPoly",
+               na.action = na.omit,
+               preprocess = c("sclae","center"),
+               trControl = trainControl(method = "none"),
+               tuneGrid = data.frame(degree = 3, scale = 0.1, C = 4)
+               )
+               
+
+# Build CV Model (long processing)
+TrainingSet$transport_mode <- as.character(TrainingSet$transport_mode)
+model.svmPoly.cv <- train(transport_mode ~ ., 
+               data = TrainingSet,
+               method = "svmPoly",
+               na.action = na.omit,
+               preprocess = c("sclae","center"),
+               trControl = fitControl,
+               tuneGrid = data.frame(degree = 3, scale = 0.1, C = 4) # Fit Model) 
+               )
+                
+               
+(model.svmPoly.cv$bestTune)
+
+# Make Predictions
+model.svmPoly.training <- predict(model.svmPoly, TrainingSet)
+model.svmPoly.testing <- predict(model.svmPoly, TestingSet)
+
+# Make Predictions from Cross Validation model
+model.svmPoly.cv.training <- predict(model.svmPoly.cv, TrainingSet)
+model.svmPoly.cv.testing <- predict(model.svmPoly.cv, TestingSet)
+
+# Model Performance
+model.svmPoly.training.confusion <- confusionMatrix(model.svmPoly.training, as.factor(TrainingSet$transport_mode))
+model.svmPoly.testing.confusion <- confusionMatrix(model.svmPoly.testing, as.factor(TestingSet$transport_mode))
+model.svmPoly.cv.confusion <- confusionMatrix(model.svmPoly.cv.training, as.factor(TrainingSet$transport_mode))
+(model.svmPoly.cv.testing.confusion <- confusionMatrix(model.svmPoly.cv.testing, as.factor(TestingSet$transport_mode))) # Print test run with CV
+
+# Precision for each class
+cat("\nPrecision for each class:\n")
+(precision_svmPoly <- model.svmPoly.cv.testing.confusion$byClass[, "Precision"])
+cat("\nAverage Precision:\n")
+(precision_svmPoly_avg <- mean(model.svmPoly.cv.testing.confusion$byClass[, "Precision"]))
+
+# Recall for each class
+cat("\nRecall for each class:\n")
+(recall_svmPoly <- model.svmPoly.cv.testing.confusion$byClass[, "Recall"])
+cat("\nAverage Recall:\n")
+(recall_svmPoly_avg <- mean(model.svmPoly.cv.testing.confusion$byClass[, "Recall"]))
+
+# F1-Score for each class
+cat("\nF1-Score for each class:\n")
+(f1_score_svmPoly <- model.svmPoly.cv.testing.confusion$byClass[, "F1"])
+cat("\nAverage F1-Score:\n")
+(f1_score_svmPoly_avg <- mean(model.svmPoly.cv.testing.confusion$byClass[, "F1"]))
+
+# Save the models
+saveRDS(model.svmPoly, "models/model_svmPoly.rds")
+saveRDS(model.svmPoly.cv, "models/model_svmPoly_cv.rds")
+```
+
+# Run Best Model with Full Data Set
+
+The polynomial SVM performed best. The model is used to predict the transport mode on the full data set, containing 40'529 data points after pre processing and threshold filtering. The achieved overall accuracy is 82.1% with the 95% confidence interval of \[81.73%, 82.48%\]. The full data set is very imbalanced, nevertheless the unweighted averaged F1-score lies at 80.7%
+
+```{r}
+# Set seed for reproducibility
+set.seed(100)
+
+# Run Model on full data set
+model.final <- predict(model.svmPoly.cv, working_dataset_full)
+
+# Create final data frame
+working_dataset_result <- data.frame(working_dataset_full, model.final) 
+
+# Confusion Matrix for new results
+conf_matrix <- confusionMatrix(as.factor(working_dataset_result$transport_mode), as.factor(working_dataset_result$model.final))
+cat("Confusion Matrix:\n")
+conf_matrix
+
+# Precision for each class
+precision <- conf_matrix$byClass[, "Precision"]
+cat("\nPrecision for each class:\n")
+precision
+
+# Average Precision
+avg_precision <- mean(conf_matrix$byClass[, "Precision"])
+cat("\nAverage Precision:\n")
+avg_precision
+
+# Recall for each class
+recall <- conf_matrix$byClass[, "Recall"]
+cat("\nRecall for each class:\n")
+recall
+
+# Average Recall
+avg_recall <- mean(conf_matrix$byClass[, "Recall"])
+cat("\nAverage Recall:\n")
+avg_recall
+
+# F1-Score for each class
+f1_score <- conf_matrix$byClass[, "F1"]
+cat("\nF1-Score for each class:\n")
+f1_score
+
+# Average F1-Score
+avg_f1_score <- mean(conf_matrix$byClass[, "F1"])
+cat("\nAverage F1-Score:\n")
+avg_f1_score
+
+
+# Save working_dataset_result as a CSV file
+write.csv(working_dataset_result, "data/working_dataset_result.csv", row.names = FALSE)
+```
+
+The resulting class distribution shows that the model predicts too many points as train. This boosts the models performance, since the train class is strongly over represented in this data set. Between the transport modes Car, Bus, Bike and Tram we expected many false classifications, since key parameters such as velocity and acceleration lie in similar ranges and are difficult to distinguish by the model.
+
+```{r}
+# Show class distribution
+final_classes <- ggplot(working_dataset_full) + 
+  geom_bar(aes(x = model.final)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_hline(yintercept = 500, colour = "red", linetype = "dashed") +
+  ylim(c(0,14000)) + xlab("Transport Mode")
+
+classes <- ggplot(working_dataset_result) + 
+  geom_bar(aes(x = transport_mode)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_hline(yintercept = 500, colour = "red", linetype = "dashed") +
+  ylim(c(0,14000)) + xlab("Transport Mode")
+
+grid.arrange(classes, final_classes, nrow = 1)
+table(working_dataset_result$transport_mode)
+table(working_dataset_result$model.final)
+```
+
+# Post Processing
+
+To boost the model performance some simple post processing is applied. A moving window function is used to find misclassified points within segments. This function searches within x neighbors of a point and if a given percentage of these points belong to one class the point is reclassified as the majority of its neighboring points. This process can be applied iteratively.
+
+For this data set a window size of 1, a threshold percentage of 75% and 3 iterations results in a smoothing of the results, but not necessarily a gain in model accuracy.
+
+```{r}
+# Run a loop to identify outlier points in classification. If prevous and following x points are identical, 
+# but the middle one is different it is changed
+
+
+# Define the number of previous and following points to consider
+# x: Number of points to be looked at surrounding current value in each direction (x*2 neighbours considered)
+# threshold_percentage: number of points which have to be equal so the current value gets changed
+# i: number of iterations
+
+single_point_correction <- function(df, x, threshold_percentage, iterations) {
+  
+  # Track the number of points changed
+  changed_count <- 0  
+  
+  for (iter in 1:iterations) {
+    for (i in (x + 1):(nrow(df) - x)) {
+      current_value <- df$model.final[i]
+      
+      # Find x-Previous & x-Following Values around point i
+      previous_values <- df$model.final[(i - x):(i - 1)]
+      following_values <- df$model.final[(i + 1):(i + x)]
+      
+      # Calculate the number of occurrences for each class in the surrounding points
+      class_counts <- table(c(previous_values, following_values))
+      
+      # Find the class that occurs most frequently
+      most_frequent_class <- names(class_counts)[which.max(class_counts)]
+      
+      # Check if the most frequent class exceeds the threshold count
+      if (class_counts[most_frequent_class] > threshold_percentage * length(c(previous_values, following_values))) {
+        df$model.final[i] <- most_frequent_class
+        changed_count <- changed_count + 1
+      }
+    }
+  message("Metrics after each iteration:")
+  conf_matrix_func <- confusionMatrix(as.factor(df$transport_mode), as.factor(df$model.final))
+  # Precision for each class
+  cat("\n Mean Precision\n")
+  print(precision_func <- mean(conf_matrix_func$byClass[, "Precision"]))
+  # Recall for each class
+  cat("\n Mean Recall\n")
+  print(recall_func <- mean(conf_matrix_func$byClass[, "Recall"]))
+  # F1-Score for each class
+  cat("\n Mean F1-Score\n")
+  print(f1_score_func <- mean(conf_matrix_func$byClass[, "F1"]))
+  
+  }
+  
+
+  message("Number of times the condition is true and values are updated:", changed_count)
+  
+
+  return(df)
+}
+ 
+
+working_dataset_result_copy <- working_dataset_result
+
+working_dataset_result <- single_point_correction(working_dataset_result, 10, 0.75, 3)
+
+```
+
+## After Post-Processing Evaluation
+
+```{r}
+# Confusion Matrix for new results
+conf_matrix_2 <- confusionMatrix(as.factor(working_dataset_result$transport_mode), as.factor(working_dataset_result$model.final))
+cat("Confusion Matrix:\n")
+conf_matrix_2
+
+# Precision for each class
+precision_2 <- conf_matrix_2$byClass[, "Precision"]
+cat("\nPrecision for each class:\n")
+precision_2
+
+# Average Precision
+avg_precision_2 <- mean(conf_matrix_2$byClass[, "Precision"])
+cat("\nAverage Precision:\n")
+avg_precision_2
+
+# Recall for each class
+recall_2 <- conf_matrix_2$byClass[, "Recall"]
+cat("\nRecall for each class:\n")
+recall_2
+
+# Average Recall
+avg_recall_2 <- mean(conf_matrix_2$byClass[, "Recall"])
+cat("\nAverage Recall:\n")
+avg_recall_2
+
+# F1-Score for each class
+f1_score_2 <- conf_matrix_2$byClass[, "F1"]
+cat("\nF1-Score for each class:\n")
+f1_score_2
+
+# Average F1-Score
+avg_f1_score <- mean(conf_matrix_2$byClass[, "F1"])
+cat("\nAverage F1-Score:\n")
+avg_f1_score
+
+```
+
+After the preprocessing we do not find a siginificant difference in the class dsitribution
+
+```{r}
+# Show class distribution
+final_classes <- ggplot(working_dataset_result) + 
+  geom_bar(aes(x = model.final)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylim(c(0,14000)) +
+  ggtitle("Ground Truth Class Distribution") +
+  xlab("Transport Mode")
+
+classes <- ggplot(working_dataset_result) + 
+  geom_bar(aes(x = transport_mode)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylim(c(0,14000)) +
+  ggtitle("Class Distribution After \nPost Processing") +
+  xlab("Transport Mode")
+
+
+grid.arrange(final_classes,classes, nrow = 1)
+cat("Ground Truth\n")
+table(working_dataset_result$transport_mode)
+cat("\nClassification \n")
+table(working_dataset_result$model.final)
+```
+
+# Findings
+
+The preprocessing of GPS data plays a crucial role in influencing the classification results. While individual computed parameters such as velocity, acceleration, and sinuosity provide valuable information, they are insufficient to construct a robust model on their own. However, applying moving window functions to these parameters can greatly enhance the accuracy of the model (Biljecki et al., 2013; Roy et al. 2020).
+
+To effectively differentiate between similar classes like buses, trams, cars, bikes, and boats, additional parameters need to be considered. For instance, incorporating the distance to public traffic networks specific to each transport mode can significantly improve the accuracy of the model. These additional parameters provide valuable contextual information that aids in distinguishing between similar classes.
+
+In urban settings, distinguishing between bus, tram, and car travel poses a particular challenge due to the characteristic stop-and-go movement patterns. The frequent fluctuations between low velocities and accelerations make it difficult to discern the specific class. These movement patterns can correspond to multiple classes and create ambiguity in the classification process.
+
+By addressing these challenges and incorporating the aforementioned improvements, model accuracy can be enhanced the and the complexities associated with distinguishing between different transport modes can be effectively tackled, particularly within urban environments.
+
+# Discussion
+
+In order to enhance the overall classification accuracy, it is crucial to adopt a more strategic approach to test various parameters and their impact on the classification results. This includes exploring different preprocessing techniques, employing diverse models, and implementing appropriate post-processing steps. Specifically moving window size, which imparts a smoothing effect on computed parameters, and the hyperparameters of the SVM models could benefit from further refinement with increased computational power.
+
+In related studies on transport mode detection, segmentation has been successfully applied to the data (Biljecki et al., 2013; Roy et al. 2020). In this context, point data was utilized to investigate whether the classification model could autonomously identify distinct segments. Preliminary results suggest that the model often identifies segments, but further analysis is necessary to validate these findings. Furthermore, Biljecki et al. (2013) proposed categorizing different transport modes into land, water, and air travel and classify each individually.
+This approach was not implemented, but by incorporating distance-to-water calculations to identify instances of boat travel, it is possible to identify boat travel within the same model as land travel.  
+
+To improve the data quality of GPS data, there are several potential avenues to explore. One approach is to employ a quicker sampling interval, allowing for more frequent data points to be captured. Additionally, supplementing GPS data with accelerometer data, as demonstrated by Roy et al. (2020), has been shown to enhance model performance, leading to an accuracy improvement of approximately 90%.
+
+By incorporating these improvements, we can enhance the classification accuracy and overall performance of the model, providing more robust and reliable results.
+
+# Literature
+
+Biljecki, F., Ledoux, H., & Van Oosterom, P. (2013). Transportation mode-based segmentation and classification of movement trajectories. International Journal of Geographical Information Science, 27(2), 385-407.
+
+Roy, A., Fuller, D., Stanley, K., & Nelson, T. (2020). Classifying transport mode from global positioning systems and accelerometer data: a machine learning approach. Findings.
+
+```{r}
+wordcountaddin::text_stats("index.qmd")
+```
