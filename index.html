@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Cyril Geistlich and Micha Franz">
+
+<title>The title of your Semesterproject</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/quarto.js"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="index_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">The title of your Semesterproject</h1>
+<p class="subtitle lead">A subtle subtitle</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Cyril Geistlich and Micha Franz </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<!-- You can add  your R Code with Code chunks-->
+<div class="cell">
+
+</div>
+<section id="abstract" class="level2">
+<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<p>This project aims to investigate key factors and features in GPS tracking data to differentiate transportation vehicles. Machine learning is applied to automate transportation mode detection using spatial, temporal, and attribute analysis. Manual verification of results ensures accuracy. The findings contribute to computational movement analysis and automated transportation mode detection.</p>
+</section>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+</section>
+<section id="research-question" class="level2">
+<h2 class="anchored" data-anchor-id="research-question">Research Question</h2>
+<p>What are the key factors and features that can be extracted from GPS tracking data to differentiate between different types of transportation modes? How can machine learning techniques be applied to GPS tracking data to automate the detection of the mode of transportation and which accuracies can be achieved by different machine learning algorithms?</p>
+</section>
+<section id="data-methods" class="level2">
+<h2 class="anchored" data-anchor-id="data-methods">Data &amp; Methods</h2>
+<section id="data" class="level3">
+<h3 class="anchored" data-anchor-id="data">Data</h3>
+<p>The data used in this project are of two kind. The first are the actual GPS tracking data, which were recored through the Posmos App via smartphone. The collected data ranges from</p>
+</section>
+<section id="preprocessing" class="level3">
+<h3 class="anchored" data-anchor-id="preprocessing">Preprocessing</h3>
+<p>When tracking a person throughout the day using GPS data, there are instances where the person appears to be stationary, such as when in an office or at a university. However, due to GPS inaccuracies, these stationary points may not appear at the exact same location and can exhibit erratic movement patterns. The accuracy of GPS signals is often compromised in dense buildings, amplifying this phenomenon. As a result, parameters like velocity and step length can show values that are typically associated with other categories. To address this issue, two approaches have been employed.</p>
+<p>The first approach involves analyzing the angles between consecutive points. Typically, these angles are significantly smaller for stationary points compared to other movements. By visually determining a threshold angle (X), the dataset is filtered to remove all data points with angles smaller than X. This process needs to be repeated iteratively until no angles below the threshold remain, as the removal of data points alters the angles between the remaining points.</p>
+<p>The second approach considers the distance between the current point and a set number (X) of preceding and consecutive points. A point is deemed static if the maximum distance between that point and any of the X preceding or consecutive points exceeds a predefined threshold (X). However, this approach may unintentionally remove non-static data points, particularly when a person is walking slowly and numerous data points are recorded within a small distance. Adjusting the distance threshold or the number of preceding and consecutive points can mitigate this issue, but it requires striking a balance between filtering out false movements and retaining genuine data.</p>
+<p>Finding the optimal compromise between these filtering approaches involves considering the specific characteristics of the tracked person’s movements and the quality of the GPS data. By iteratively applying the angle-based filtering and analyzing the distance to surrounding points, a more accurate identification of stationary periods can be achieved, mitigating the impact of GPS inaccuracies and preserving the integrity of the tracking data.</p>
+</section>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<!-- the following is just a placeholder text, remove it!-->
+<p>Philosophy oneself passion play fearful self noble zarathustra deceptions sexuality. Endless ocean of oneself dead ocean. Selfish decrepit.</p>
+</section>
+<section id="discussion" class="level2">
+<h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
+<!-- the following is just a placeholder text, remove it!-->
+<p>Justice convictions spirit sexuality insofar free marvelous joy. Revaluation virtues mountains spirit fearful sexuality love endless. Society intentions will noble burying aversion moral. Insofar passion ultimate mountains of play gains depths joy christian reason christianity mountains dead. Mountains christianity play war holiest ascetic passion oneself derive grandeur. Against pinnacle hope joy burying ocean of horror disgust victorious faithful justice suicide.</p>
+</section>
+<section id="code" class="level2">
+<h2 class="anchored" data-anchor-id="code">Code</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"dplyr"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"sf"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"readr"</span>) </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"ggplot2"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"mapview"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"lubridate"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"zoo"</span>) </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"caret"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"LearnGeom"</span>) <span class="co"># to calculate angle</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"geosphere"</span>) <span class="co"># to calculate distances</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"RColorBrewer"</span>) <span class="co"># to create custom color palettes</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"ggcorrplot"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"ROSE"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"gridExtra"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="supporting-functions" class="level2">
+<h2 class="anchored" data-anchor-id="supporting-functions">supporting functions</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>custom_mapview <span class="ot">&lt;-</span> <span class="cf">function</span>(sf_object){</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mapview</span>(sf_object, <span class="at">cex =</span> <span class="dv">4</span>, <span class="at">col.regions =</span> <span class="st">"#700101"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># creates lines out of points for visualisation purposes</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>point2line <span class="ot">&lt;-</span> <span class="cf">function</span>(points){</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  geometries <span class="ot">&lt;-</span> <span class="fu">st_cast</span>(<span class="fu">st_geometry</span>(points <span class="sc">%&gt;%</span> <span class="fu">select</span>(geometry)), <span class="st">"POINT"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(geometries) <span class="sc">-</span> <span class="dv">1</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  linestrings <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="at">X =</span> <span class="dv">1</span><span class="sc">:</span>n, <span class="at">FUN =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  pair <span class="ot">&lt;-</span> <span class="fu">st_combine</span>(<span class="fu">c</span>(geometries[x], geometries[x <span class="sc">+</span> <span class="dv">1</span>]))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  line <span class="ot">&lt;-</span> <span class="fu">st_cast</span>(pair, <span class="st">"LINESTRING"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(line)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  multilinetring <span class="ot">&lt;-</span> <span class="fu">st_multilinestring</span>(<span class="fu">do.call</span>(<span class="st">"rbind"</span>, linestrings))</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(linestrings[<span class="dv">1</span>])</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="fu">length</span>(linestrings)){</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    temp <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(linestrings[i])</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span>  <span class="fu">rbind</span>(df, temp) </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  sf_lines <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> <span class="fu">st_as_sf</span>()</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>un_col <span class="ot">&lt;-</span> <span class="cf">function</span>(df){</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">length</span>(<span class="fu">unique</span>(df)))</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="data-prep" class="level1">
+<h1>1. Data Prep</h1>
+<section id="read-data" class="level2">
+<h2 class="anchored" data-anchor-id="read-data">1.1 Read Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#posmo_truth_csv &lt;- read.delim("data/posmo_full.csv",sep=",")</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>posmo_micha_truth_csv <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">"data/manually_labelled/posmo_20230502_to_20230613_m.csv"</span>,<span class="at">sep=</span><span class="st">","</span>) </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>posmo_cyril_truth_csv <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">"data/manually_labelled/posmo_2023-05-01T00_00_00+02_00-2023-06-26T23_59_59+02_00.csv"</span>,<span class="at">sep=</span><span class="st">","</span>) </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>posmo_micha_csv <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">"data/posmo_labelled/posmo_20230502_to_20230613_p.csv"</span>,<span class="at">sep=</span><span class="st">","</span>) </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># From data pool</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>posmo_pool_1 <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">"data/manually_labelled/posmo.csv"</span>,<span class="at">sep=</span><span class="st">","</span>) </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>posmo_pool_2 <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">"data/manually_labelled/posmo_2.csv"</span>,<span class="at">sep=</span><span class="st">","</span>) </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>posmo_pool_3 <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">"data/manually_labelled/posmo_BuJa.csv"</span>,<span class="at">sep=</span><span class="st">","</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tram_netz <span class="ot">&lt;-</span> <span class="fu">read_sf</span>(<span class="st">"data/tlm_oev_eisenbahn/tlm_oev_eisenbahn_tram.shp"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, geometry) <span class="sc">%&gt;%</span> <span class="fu">st_zm</span>() <span class="sc">%&gt;%</span> <span class="fu">st_buffer</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> st_union</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>zug_netz <span class="ot">&lt;-</span> <span class="fu">read_sf</span>(<span class="st">"data/tlm_oev_eisenbahn/tlm_oev_eisenbahn_bahn.shp"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, geometry) <span class="sc">%&gt;%</span> <span class="fu">st_zm</span>() <span class="sc">%&gt;%</span> <span class="fu">st_buffer</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> st_union</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>gewaesser <span class="ot">&lt;-</span> <span class="fu">read_sf</span>(<span class="st">"data/tlm_bb_gewaesser/tlm_bb_gewaesser_larger20000.shp"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, geometry) <span class="sc">%&gt;%</span> <span class="fu">st_zm</span>() <span class="sc">%&gt;%</span> st_union</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>strassen <span class="ot">&lt;-</span> <span class="fu">read_sf</span>(<span class="st">"data/tlm_strassen/strassen_AOI.shp"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, geometry) <span class="sc">%&gt;%</span> <span class="fu">st_zm</span>() <span class="sc">%&gt;%</span> <span class="fu">st_buffer</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> st_union</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>bus_netz_zvv <span class="ot">&lt;-</span> <span class="fu">read_sf</span>(<span class="st">"data/zvv_netz/Linien_des_offentlichen_Verkehrs_-OGD.gpkg"</span>, <span class="at">layer=</span><span class="st">"ZVV_LINIEN_L"</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>bus_netz_zvv <span class="ot">&lt;-</span> bus_netz_zvv[<span class="fu">grepl</span>(<span class="st">"bus|Bus"</span>, bus_netz_zvv<span class="sc">$</span>BETRIEBSZWEIG_TXT), ] <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">geometry =</span> geom) <span class="sc">%&gt;%</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(geometry) <span class="sc">%&gt;%</span> <span class="fu">st_buffer</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="fu">st_union</span>()</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>bus_netz_bern <span class="ot">&lt;-</span> <span class="fu">read_sf</span>(<span class="st">"data/geoinformation_bern/OEVTP_LINIE.shp"</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(VERKMITT_B <span class="sc">==</span> <span class="st">"Bus"</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(geometry) <span class="sc">%&gt;%</span><span class="fu">st_zm</span>() <span class="sc">%&gt;%</span> <span class="fu">st_buffer</span>(<span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="fu">st_union</span>()</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>bus_netz <span class="ot">&lt;-</span> <span class="fu">st_union</span>(bus_netz_bern, bus_netz_zvv)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="clean-and-preprocess-data" class="level2">
+<h2 class="anchored" data-anchor-id="clean-and-preprocess-data">1.2.1 Clean and preprocess data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>process_posmo_data <span class="ot">&lt;-</span> <span class="cf">function</span>(posmo_data) { <span class="co"># function with preprocessing steps</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert to sf object</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  posmo_data <span class="ot">&lt;-</span> posmo_data <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"lon_x"</span>, <span class="st">"lat_y"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">2056</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove unwanted columns</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  posmo_data <span class="ot">&lt;-</span> posmo_data[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>)]</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Fix Timestamp</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  posmo_data<span class="sc">$</span>datetime <span class="ot">&lt;-</span> <span class="fu">ymd_hms</span>(posmo_data<span class="sc">$</span>datetime) <span class="sc">+</span> <span class="fu">hours</span>(<span class="dv">2</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add ID to rows</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  posmo_data <span class="ot">&lt;-</span> posmo_data <span class="sc">%&gt;%</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">row_number</span>())</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove duplicate time values</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  posmo_data <span class="ot">&lt;-</span> posmo_data[<span class="sc">!</span><span class="fu">duplicated</span>(posmo_data<span class="sc">$</span>datetime), ]</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># remove subsequent duplicate location (person wasn't moving)</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  posmo_data <span class="ot">&lt;-</span> posmo_data <span class="sc">%&gt;%</span> </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(geometry <span class="sc">!=</span> <span class="fu">lead</span>(geometry))</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(posmo_data)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="co"># posmo_micha_truth &lt;- process_posmo_data(posmo_micha_truth_csv)</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co"># posmo_cyril_truth &lt;- process_posmo_data(posmo_cyril_truth_csv)</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co"># posmo_micha &lt;-  process_posmo_data(posmo_micha_csv)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># micha_subset &lt;- posmo_micha_truth %&gt;% filter(datetime &lt; ymd("20230506") &amp; datetime &gt; ymd("20230501"))</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># working_dataset &lt;- posmo_micha_truth</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="remove-static-data-points" class="level3">
+<h3 class="anchored" data-anchor-id="remove-static-data-points">1.2.2 Remove static data points</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>filterStaticByDistance <span class="ot">&lt;-</span> <span class="cf">function</span>(data, threshold_distance, consecutive_points) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">require</span>(geosphere)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># transform to WGS84, necessary to calculate distance using geosphere</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(<span class="dv">4326</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract coordinates from the geometry</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  coords <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">st_coordinates</span>(data))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  data<span class="sc">$</span>longitude <span class="ot">&lt;-</span> coords<span class="sc">$</span>X</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  data<span class="sc">$</span>latitude <span class="ot">&lt;-</span> coords<span class="sc">$</span>Y</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate distances to preceding and consecutive points</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  distances <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">nrow</span>(data))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> (consecutive_points <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>(<span class="fu">nrow</span>(data) <span class="sc">-</span> consecutive_points)) {</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    next_points <span class="ot">&lt;-</span> coords[(i <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>(i <span class="sc">+</span> consecutive_points), ]</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    prev_points <span class="ot">&lt;-</span> coords[(i <span class="sc">-</span> <span class="dv">1</span>)<span class="sc">:</span>(i <span class="sc">-</span> consecutive_points), ]</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    all_points <span class="ot">&lt;-</span> <span class="fu">rbind</span>(next_points, prev_points)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    distances[i] <span class="ot">&lt;-</span> <span class="fu">max</span>(geosphere<span class="sc">::</span><span class="fu">distGeo</span>(coords[i, ], all_points))</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filter out points where the maximum distance exceeds the threshold</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  filtered_data <span class="ot">&lt;-</span> data[distances <span class="sc">&gt;=</span> threshold_distance <span class="sc">|</span> distances <span class="sc">==</span> <span class="dv">0</span>, ] <span class="co"># keep first/last values which are 0</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Transform back to LV95</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  filtered_data <span class="ot">&lt;-</span> filtered_data <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(<span class="dv">2056</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">filtered_data =</span> filtered_data, <span class="at">distances =</span> distances)) <span class="co"># distances are just needed for testing thresholds</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>getAngle <span class="ot">&lt;-</span> <span class="cf">function</span>(coords) {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  angles <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">nrow</span>(coords)) <span class="co"># Initialize angles as a numeric vector</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  angles[<span class="dv">1</span>] <span class="ot">=</span> <span class="cn">NA</span> <span class="co"># first point can't have an angle</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>(<span class="fu">nrow</span>(coords) <span class="sc">-</span> <span class="dv">1</span>)) { <span class="co"># calculate the angle for 3 consecutive points, similar to lag/lead</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    angle <span class="ot">&lt;-</span> <span class="fu">Angle</span>( <span class="co">#function from library LearnGeom</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(coords[i <span class="sc">-</span> <span class="dv">1</span>, <span class="st">"X"</span>], coords[i <span class="sc">-</span> <span class="dv">1</span>, <span class="st">"Y"</span>]),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(coords[i, <span class="st">"X"</span>], coords[i, <span class="st">"Y"</span>]),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(coords[i <span class="sc">+</span> <span class="dv">1</span>, <span class="st">"X"</span>], coords[i <span class="sc">+</span> <span class="dv">1</span>, <span class="st">"Y"</span>])</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    angles[i] <span class="ot">&lt;-</span> angle <span class="co"># Assign the calculated angle to the corresponding index in angles</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  angles[<span class="fu">nrow</span>(coords)] <span class="ot">=</span> <span class="cn">NA</span> <span class="co"># last point cant have an angle</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(angles))</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>filterStaticByAngle <span class="ot">&lt;-</span> <span class="cf">function</span>(working_dataset, angleTreshold){</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  coords <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">st_coordinates</span>(working_dataset), working_dataset<span class="sc">$</span>id)  </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  working_dataset<span class="sc">$</span>angle <span class="ot">&lt;-</span> <span class="fu">getAngle</span>(coords)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  min_angle <span class="ot">&lt;-</span> <span class="fu">min</span>(working_dataset<span class="sc">$</span>angle, <span class="at">na.rm =</span> T)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> (min_angle <span class="sc">&lt;=</span> angleTreshold) { <span class="co"># iteratively filter out tight angles until none smaller 60 are left</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    working_dataset <span class="ot">&lt;-</span> working_dataset <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">is.na</span>(angle) <span class="sc">|</span> angle <span class="sc">&gt;</span> angleTreshold) <span class="co"># exclude first and last value (=NA)</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    coords <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">st_coordinates</span>(working_dataset), working_dataset<span class="sc">$</span>id)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    working_dataset<span class="sc">$</span>angle <span class="ot">&lt;-</span> <span class="fu">getAngle</span>(coords)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    min_angle <span class="ot">&lt;-</span> <span class="fu">min</span>(working_dataset<span class="sc">$</span>angle, <span class="at">na.rm =</span> T)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(working_dataset)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># result &lt;- filterStaticByDistance(working_dataset, threshold_distance = 60, consecutive_points = 5)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># filteredByDistance &lt;- result$filtered_data</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># working_dataset$distances &lt;- result$distances # just for testing threshold values</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># filteredByAngle &lt;- filterStaticByAngle(working_dataset, 60)</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># filtertedByDistance_and_Angle &lt;- filterStaticByAngle(filteredByDistance, 60)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filtered_data_line &lt;- point2line(filtertedByDistance_and_Angle)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># filtered_angle_line &lt;- point2line(filteredByAngle)</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># unfiltered_data_line &lt;- point2line(working_dataset)</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># pal_blue &lt;- colorRampPalette(c("cyan", "blue"))</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># pal_orng &lt;- colorRampPalette(c("yellow", "red"))</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co"># mapview(working_dataset, alpha.regions=1.0, col.regions = "#901010") +</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   mapview(unfiltered_data_line, color="#901010", lwd=2) +</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   mapview(filtertedByDistance_and_Angle, alpha.regions=1.0, col.regions="#008940") +</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   mapview(filtered_data_line, color="#008940", lwd=2) </span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co"># mapview(working_dataset, alpha.regions=1.0, col.regions = "#901010", cex=4) +</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   mapview(unfiltered_data_line, color="#901010", lwd=2) +</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#   mapview(filteredByAngle, alpha.regions=1.0, col.regions="orange", cex=4) +</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#   mapview(filtered_angle_line, color="orange", lwd=2) </span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># mapview(filtered_data_line, color="#008940", lwd=2) +</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#   mapview(unfiltered_data_line, color="#901010", lwd=2)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="segmentation" class="level2">
+<h2 class="anchored" data-anchor-id="segmentation">1.3 Segmentation?</h2>
+</section>
+<section id="calculate-movement-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="calculate-movement-parameters">1.4 Calculate Movement Parameters</h2>
+<section id="speed-additional-moving-window-speed" class="level3">
+<h3 class="anchored" data-anchor-id="speed-additional-moving-window-speed">1.4.1 Speed/ Additional Moving Window Speed?</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>calc_movement_params <span class="ot">&lt;-</span> <span class="cf">function</span>(working_dataset){</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create Coord Column</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  coords <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">st_coordinates</span>(working_dataset), working_dataset<span class="sc">$</span>id)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate Time Difference between steps (diff_s), steplenght and velocity. </span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  working_dataset <span class="ot">&lt;-</span> working_dataset <span class="sc">|&gt;</span> </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff_s =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(<span class="fu">lead</span>(datetime),datetime))) <span class="sc">|&gt;</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">steplength =</span> ((coords<span class="sc">$</span>X <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>X))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (coords<span class="sc">$</span>Y <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>Y))<span class="sc">^</span><span class="dv">2</span>)<span class="sc">^</span><span class="fl">0.5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">velocity =</span> <span class="fu">as.numeric</span>(steplength<span class="sc">/</span>diff_s)) <span class="sc">|&gt;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(diff_s <span class="sc">!=</span> <span class="dv">0</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  coords <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">st_coordinates</span>(working_dataset), working_dataset<span class="sc">$</span>id)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Calculate Moving Window Step length</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  working_dataset <span class="ot">&lt;-</span> working_dataset <span class="sc">|&gt;</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">step_mean =</span> <span class="fu">rowMeans</span>(</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cbind</span>(</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((<span class="fu">lag</span>(coords<span class="sc">$</span>X, <span class="dv">3</span>) <span class="sc">-</span> coords<span class="sc">$</span>X)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">lag</span>(coords<span class="sc">$</span>Y, <span class="dv">3</span>) <span class="sc">-</span> coords<span class="sc">$</span>Y)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((<span class="fu">lag</span>(coords<span class="sc">$</span>X, <span class="dv">2</span>) <span class="sc">-</span> coords<span class="sc">$</span>X)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">lag</span>(coords<span class="sc">$</span>Y, <span class="dv">2</span>) <span class="sc">-</span> coords<span class="sc">$</span>Y)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((<span class="fu">lag</span>(coords<span class="sc">$</span>X, <span class="dv">1</span>) <span class="sc">-</span> coords<span class="sc">$</span>X)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">lag</span>(coords<span class="sc">$</span>Y, <span class="dv">1</span>) <span class="sc">-</span> coords<span class="sc">$</span>Y)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((coords<span class="sc">$</span>X <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>X, <span class="dv">1</span>))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (coords<span class="sc">$</span>Y <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>Y, <span class="dv">1</span>))<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((coords<span class="sc">$</span>X <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>X, <span class="dv">2</span>))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (coords<span class="sc">$</span>Y <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>Y, <span class="dv">2</span>))<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((coords<span class="sc">$</span>X <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>X, <span class="dv">3</span>))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (coords<span class="sc">$</span>Y <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>Y, <span class="dv">3</span>))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Calculate Moving Window diff_s</span></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>  working_dataset <span class="ot">&lt;-</span> working_dataset <span class="sc">|&gt;</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">diff_s_mean =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(<span class="fu">lead</span>(datetime,<span class="dv">3</span>),<span class="fu">lag</span>(datetime,<span class="dv">3</span>)))<span class="sc">/</span><span class="dv">6</span>)</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Calculate Moving Window velocity</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>  working_dataset <span class="ot">&lt;-</span> working_dataset <span class="sc">|&gt;</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">velocity_mean =</span> <span class="fu">as.numeric</span>(step_mean<span class="sc">/</span>diff_s_mean))</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Delete Infitinte Values (is there better solution?)</span></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>  <span class="co">#working_dataset$velocity &lt;- working_dataset$velocity[!is.infinite(working_dataset$velocity)]</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>  coords <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">st_coordinates</span>(working_dataset), working_dataset<span class="sc">$</span>id)</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>  <span class="co">#Acceleration stepwise</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>  working_dataset<span class="sc">$</span>acceleration <span class="ot">&lt;-</span> working_dataset<span class="sc">$</span>velocity<span class="sc">/</span><span class="fu">lag</span>(working_dataset<span class="sc">$</span>diff_s)</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate acceleration using a moving window</span></span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>  working_dataset <span class="ot">&lt;-</span> working_dataset <span class="sc">|&gt;</span></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">acceleration_mean =</span> <span class="fu">rowMeans</span>(</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cbind</span>(</span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>        <span class="fu">lag</span>(working_dataset<span class="sc">$</span>acceleration,<span class="dv">3</span>),</span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>        <span class="fu">lag</span>(working_dataset<span class="sc">$</span>acceleration,<span class="dv">2</span>),</span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>        <span class="fu">lag</span>(working_dataset<span class="sc">$</span>acceleration,<span class="dv">1</span>),</span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>        working_dataset<span class="sc">$</span>acceleration,</span>
+<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>        <span class="fu">lead</span>(working_dataset<span class="sc">$</span>acceleration,<span class="dv">1</span>),</span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a>        <span class="fu">lead</span>(working_dataset<span class="sc">$</span>acceleration,<span class="dv">2</span>),</span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>        <span class="fu">lead</span>(working_dataset<span class="sc">$</span>acceleration,<span class="dv">3</span>)</span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate Sinuosity using moving step_mean as path length and euclidean distance between</span></span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>  working_dataset <span class="ot">&lt;-</span> working_dataset <span class="sc">|&gt;</span></span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">sinuosity =</span> </span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>      ( <span class="co"># Path Length/Direct distance between first and last point</span></span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((<span class="fu">lag</span>(coords<span class="sc">$</span>X, <span class="dv">3</span>) <span class="sc">-</span> <span class="fu">lag</span>(coords<span class="sc">$</span>X, <span class="dv">2</span>))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">lag</span>(coords<span class="sc">$</span>Y, <span class="dv">3</span>) <span class="sc">-</span> <span class="fu">lag</span>(coords<span class="sc">$</span>Y, <span class="dv">2</span>))<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((<span class="fu">lag</span>(coords<span class="sc">$</span>X, <span class="dv">2</span>) <span class="sc">-</span> <span class="fu">lag</span>(coords<span class="sc">$</span>X, <span class="dv">1</span>))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">lag</span>(coords<span class="sc">$</span>Y, <span class="dv">2</span>) <span class="sc">-</span> <span class="fu">lag</span>(coords<span class="sc">$</span>Y, <span class="dv">1</span>))<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((<span class="fu">lag</span>(coords<span class="sc">$</span>X, <span class="dv">1</span>) <span class="sc">-</span> coords<span class="sc">$</span>X)<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">lag</span>(coords<span class="sc">$</span>Y, <span class="dv">1</span>) <span class="sc">-</span> coords<span class="sc">$</span>Y)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((coords<span class="sc">$</span>X <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>X, <span class="dv">1</span>))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (coords<span class="sc">$</span>Y <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>Y, <span class="dv">1</span>))<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((<span class="fu">lead</span>(coords<span class="sc">$</span>X, <span class="dv">1</span>) <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>X, <span class="dv">2</span>))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">lead</span>(coords<span class="sc">$</span>Y, <span class="dv">1</span>) <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>Y, <span class="dv">2</span>))<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sqrt</span>((<span class="fu">lead</span>(coords<span class="sc">$</span>X, <span class="dv">2</span>) <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>X, <span class="dv">3</span>))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">lead</span>(coords<span class="sc">$</span>Y, <span class="dv">2</span>) <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>Y, <span class="dv">3</span>))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>      ) </span>
+<span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a>      <span class="sc">/</span> <span class="fu">sqrt</span>((<span class="fu">lag</span>(coords<span class="sc">$</span>X, <span class="dv">3</span>) <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>X, <span class="dv">3</span>))<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> (<span class="fu">lag</span>(coords<span class="sc">$</span>Y, <span class="dv">3</span>) <span class="sc">-</span> <span class="fu">lead</span>(coords<span class="sc">$</span>Y, <span class="dv">3</span>))<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a>  ) </span>
+<span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(working_dataset)</span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>run_all <span class="ot">&lt;-</span> <span class="cf">function</span>(df){</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">process_posmo_data</span>(df)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">filterStaticByDistance</span>(df, <span class="at">threshold_distance =</span> <span class="dv">60</span>, <span class="at">consecutive_points =</span> <span class="dv">5</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  result<span class="sc">$</span>filtered_data</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  filtered_by_angle <span class="ot">&lt;-</span> <span class="fu">filterStaticByAngle</span>(result<span class="sc">$</span>filtered_data, <span class="dv">60</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">calc_movement_params</span>(filtered_by_angle)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>working_dataset <span class="ot">&lt;-</span> <span class="fu">run_all</span>(posmo_micha_truth_csv)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>processed_1 <span class="ot">&lt;-</span> <span class="fu">run_all</span>(posmo_cyril_truth_csv)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>processed_2 <span class="ot">&lt;-</span> <span class="fu">run_all</span>(posmo_pool_1)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>processed_3 <span class="ot">&lt;-</span> <span class="fu">run_all</span>(posmo_pool_2)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>processed_4 <span class="ot">&lt;-</span> <span class="fu">run_all</span>(posmo_pool_3)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine data sets</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>working_dataset <span class="ot">&lt;-</span> <span class="fu">rbind</span>(working_dataset, processed_1)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>posmo_pool <span class="ot">&lt;-</span> <span class="fu">rbind</span>(processed_2,processed_3,processed_4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="closeness-to-traffic-network-and-water-bodies" class="level3">
+<h3 class="anchored" data-anchor-id="closeness-to-traffic-network-and-water-bodies">1.4.5 Closeness to Traffic Network and Water Bodies</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>data_AOI <span class="ot">&lt;-</span> <span class="fu">st_buffer</span>(working_dataset, <span class="dv">50</span>) <span class="sc">%&gt;%</span> <span class="fu">st_union</span>()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>tram_netz_AOI <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(tram_netz, data_AOI)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>distance_tram <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(working_dataset, tram_netz_AOI))</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>distance_tram <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(working_dataset<span class="sc">$</span>distance_tram <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="dv">100</span>, working_dataset<span class="sc">$</span>distance_tram)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>zug_netz_AOI <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(zug_netz, data_AOI)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>distance_zug <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(working_dataset, zug_netz_AOI))</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>distance_zug <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(working_dataset<span class="sc">$</span>distance_zug <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="dv">100</span>, working_dataset<span class="sc">$</span>distance_zug)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>gewaesser_AOI <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(gewaesser, data_AOI)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>distance_gewaesser <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(working_dataset, gewaesser_AOI))</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>distance_gewaesser <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(working_dataset<span class="sc">$</span>distance_gewaesser <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="dv">100</span>, working_dataset<span class="sc">$</span>distance_gewaesser)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>bus_netz_AOI <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(bus_netz, data_AOI)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>distance_bus <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(working_dataset, bus_netz_AOI))</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>distance_bus <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(working_dataset<span class="sc">$</span>distance_bus <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="dv">100</span>, working_dataset<span class="sc">$</span>distance_bus)</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>distance_strasse <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(working_dataset, strassen))</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>distance_strasse <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(working_dataset<span class="sc">$</span>distance_strasse <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="dv">100</span>, working_dataset<span class="sc">$</span>distance_strasse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>data_AOI <span class="ot">&lt;-</span> <span class="fu">st_buffer</span>(posmo_pool, <span class="dv">50</span>) <span class="sc">%&gt;%</span> <span class="fu">st_union</span>()</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>tram_netz_AOI <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(tram_netz, data_AOI)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>distance_tram <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(posmo_pool, tram_netz_AOI))</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>distance_tram <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(posmo_pool<span class="sc">$</span>distance_tram <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="dv">100</span>, posmo_pool<span class="sc">$</span>distance_tram)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>zug_netz_AOI <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(zug_netz, data_AOI)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>distance_zug <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(posmo_pool, zug_netz_AOI))</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>distance_zug <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(posmo_pool<span class="sc">$</span>distance_zug <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="dv">100</span>, posmo_pool<span class="sc">$</span>distance_zug)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>gewaesser_AOI <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(gewaesser, data_AOI)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>distance_gewaesser <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(posmo_pool, gewaesser_AOI))</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>distance_gewaesser <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(posmo_pool<span class="sc">$</span>distance_gewaesser <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="dv">100</span>, posmo_pool<span class="sc">$</span>distance_gewaesser)</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>bus_netz_AOI <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(bus_netz, data_AOI)</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>distance_bus <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(posmo_pool, bus_netz_AOI))</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>distance_bus <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(posmo_pool<span class="sc">$</span>distance_bus <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="dv">100</span>, posmo_pool<span class="sc">$</span>distance_bus)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>distance_strasse <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">st_distance</span>(posmo_pool, strassen))</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>distance_strasse <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(posmo_pool<span class="sc">$</span>distance_strasse <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="dv">100</span>, posmo_pool<span class="sc">$</span>distance_strasse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="slope" class="level3">
+<h3 class="anchored" data-anchor-id="slope">1.4.6 Slope?</h3>
+</section>
+<section id="average-distance-between-points-in-section" class="level3">
+<h3 class="anchored" data-anchor-id="average-distance-between-points-in-section">1.4.7 Average Distance between points in section</h3>
+</section>
+<section id="further-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="further-parameters">Further Parameters!</h3>
+</section>
+</section>
+<section id="clean-data" class="level2">
+<h2 class="anchored" data-anchor-id="clean-data">Clean Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace NA values with a specified value (e.g., mean, median, or 0)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>working_dataset<span class="sc">$</span>sinuosity[<span class="fu">is.infinite</span>(working_dataset<span class="sc">$</span>sinuosity)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>working_dataset <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(working_dataset)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>posmo_pool<span class="sc">$</span>sinuosity[<span class="fu">is.infinite</span>(posmo_pool<span class="sc">$</span>sinuosity)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>posmo_pool <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(posmo_pool)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>velocity_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(working_dataset, <span class="fu">aes</span>(id,velocity)) <span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"velocity [m/s]"</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>acceleration_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(working_dataset, <span class="fu">aes</span>(id,acceleration)) <span class="sc">+</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"acceleration [m/s2]"</span>)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>sinuosity_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(working_dataset, <span class="fu">aes</span>(id,sinuosity)) <span class="sc">+</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>velocity_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>acceleration_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sinuosity_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-6-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ggsave("plots/velocity_plot.png", plot = velocity_plot, width = 8, height = 6, dpi = 300)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ggsave("plots/acceleration_plot.png", plot = acceleration_plot, width = 8, height = 6, dpi = 300)</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ggsave("plots/sinuosity_plot.png", plot = sinuosity_plot, width = 8, height = 6, dpi = 300)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>working_dataset_copy <span class="ot">&lt;-</span> working_dataset</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="pca" class="level1">
+<h1>2.PCA?</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># select columns with relevant variable and standardize them</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>standardized <span class="ot">&lt;-</span> working_dataset_copy[, <span class="dv">6</span><span class="sc">:</span><span class="dv">15</span>] <span class="sc">%&gt;%</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale</span>(<span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>()</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>corr_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(standardized)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggcorrplot</span>(corr_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>data_pca <span class="ot">&lt;-</span> <span class="fu">princomp</span>(corr_matrix)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> data_pca<span class="sc">$</span>loadings</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(data_pca<span class="sc">$</span>scores)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save full dataset as csv</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>working_dataset <span class="ot">&lt;-</span> <span class="fu">st_drop_geometry</span>(working_dataset)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>posmo_pool <span class="ot">&lt;-</span> <span class="fu">st_drop_geometry</span>(posmo_pool)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(working_dataset, <span class="at">file =</span> <span class="st">"data/full_working_dataset.csv"</span>, <span class="at">row.names =</span> F)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(posmo_pool, <span class="at">file =</span> <span class="st">"data/full_posmo_pool_dataset.csv"</span>, <span class="at">row.names =</span> F)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="categories" class="level1">
+<h1>3. Categories</h1>
+<p>Stationary? Walk (Running?) Bike Train Tram Bus Car Skateboard E-Scooter Boat Other</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
