@@ -74,15 +74,12 @@ library("mapview")
 library("lubridate")
 library("zoo") 
 library("caret")
-library("neuralnet")
-library("mlbench")
-# library("keras")
-# library("tensorflow")
 library("LearnGeom") # to calculate angle
-library("randomForest")
 library("geosphere") # to calculate distances
 library("RColorBrewer") # to create custom color palettes
 library("ggcorrplot")
+library("ROSE")
+library("gridExtra")
 ```
 
 ## supporting functions

@@ -6,8 +6,7 @@ editor: source
 ---
 
 ```{r}
-library(ROSE)
-library(gridExtra)
+
 ```
 
 ```{r load data}
