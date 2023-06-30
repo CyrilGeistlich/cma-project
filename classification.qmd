@@ -5,10 +5,6 @@ format: html
 editor: source
 ---
 
-```{r}
-
-```
-
 ```{r load data}
 working_dataset <- read.delim("data/full_working_dataset.csv",sep=",", header = T) 
 posmo_pool <- read.delim("data/full_posmo_pool_dataset.csv",sep=",", header = T) 
@@ -42,19 +38,12 @@ working_dataset$transport_mode[working_dataset$transport_mode == "E_Bike"] <- "O
 # working_dataset$transport_mode[working_dataset$transport_mode == "Boat"] <- "Other"
 
 # Show class distribution
-final_classes <- ggplot(working_dataset_result) + 
-  geom_bar(aes(x = model.final)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ylim(c(0,700)) +
-  geom_hline(yintercept = 500, colour = "red", linetype = "dashed")
-
-classes <- ggplot(working_dataset_result) + 
+classes <- ggplot(working_dataset) + 
   geom_bar(aes(x = transport_mode)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ylim(c(0,700)) +
   geom_hline(yintercept = 500, colour = "red", linetype = "dashed")
 
-grid.arrange(classes, final_classes, nrow = 1)
+classes
 table(working_dataset$transport_mode)
 ```
 
@@ -75,23 +64,11 @@ plot_diff_s <- ggplot(working_dataset) +
   ylim(c(0,120)) +
   ylab("sample interval [s]")
 
-
 # Set threshold for parameters
 working_dataset <- working_dataset[working_dataset$diff_s < 60,]
 
-boxplot_diff_s_after <- ggplot(working_dataset) +
-  geom_boxplot(aes(x = working_dataset$transport_mode, y = working_dataset$diff_s)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ylab("sample interval [s]")
-
-plot_diff_s_after <- ggplot(working_dataset, aes(x = id, y = diff_s,colour = transport_mode)) + 
-  geom_line() + 
-  xlim(c(0,1000)) + # Subset of id 1 to 1000
-  ylab("sample interval [s]")
-
 # Display the plots side by side
 grid.arrange(boxplot_diff_s, boxplot_diff_s_after, nrow = 2)
-grid.arrange(plot_diff_s,plot_diff_s_after, nrow = 2)
 
 ```
 
@@ -216,7 +193,7 @@ We have an imbalanced data set. The train class is overrepresented, as we do not
 # Under Sampling
 
 ```{r}
-
+working_dataset_full <- working_dataset
 
 # Set the maximum number of entries per class
 max_entries <- 500
@@ -459,20 +436,23 @@ If you suspect that there might be issues with the model or the data, it's worth
 set.seed(100)
 
 # Run Model on full dataset
-model.final <- predict(model.svmL.cv, working_dataset)
-model.final.confusion <- confusionMatrix(model.final, as.factor(working_dataset$transport_mode))
+model.final <- predict(model.svmRadial.cv, working_dataset_full_copy)
 
-# Save and Print final model confusion matrix
-(model.final.table <- model.final.confusion[[2]])
+# Create final df
+working_dataset_result <- data.frame(working_dataset_full_copy, model.final) 
 
-working_dataset_result <- data.frame(working_dataset, model.final) 
-working_dataset_result <- unique(working_dataset_result)
+# Confusion Matrix
+# Note: Only works if result and working dataset have identical transport modes as factors.
+(conf_matrix <- confusionMatrix( as.factor(working_dataset_result$model.final),as.factor(working_dataset_result$transport_mode)))
 
-working_dataset_result <- left_join(working_dataset_result, working_dataset_copy, 
-                                    by = c("angle", "diff_s", "steplength", "velocity", "step_mean", "diff_s_mean", "velocity_mean", "acceleration", "acceleration_mean", "sinuosity", "distance_tram", "distance_zug", "distance_gewaesser", "distance_bus", "distance_strasse")) |>
-  rename(transport_mode = transport_mode.x)
+# Precision for each class
+(precision <- conf_matrix$byClass[, "Precision"])
 
-working_dataset_result <- working_dataset_result[,-c(19,20)]
+# Recall for each class
+(recall <- conf_matrix$byClass[, "Recall"])
+
+# F1-Score for each class
+(f1_score <- conf_matrix$byClass[, "F1"])
 
 # Save working_dataset_result as a CSV file
 write.csv(working_dataset_result, "data/working_dataset_result.csv", row.names = FALSE)
@@ -480,21 +460,31 @@ write.csv(working_dataset_result, "data/working_dataset_result.csv", row.names =
 
 ```
 
+Confusion Matrix:
+
+Precision: Precision measures the proportion of correctly predicted positive instances out of the total instances predicted as positive. It is useful when the focus is on minimizing false positives.
+
+Recall (Sensitivity or True Positive Rate): Recall measures the proportion of correctly predicted positive instances out of the total actual positive instances. It is useful when the goal is to minimize false negatives.
+
+F1-Score: The F1-score combines precision and recall into a single metric. It provides a balance between precision and recall and is useful when both false positives and false negatives are important.
+
 ```{r}
 # Show class distribution
-final_classes <- ggplot(working_dataset_result) + 
+final_classes <- ggplot(working_dataset_full) + 
   geom_bar(aes(x = model.final)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ylim(c(0,700)) +
-  geom_hline(yintercept = 500, colour = "red", linetype = "dashed")
+  geom_hline(yintercept = 500, colour = "red", linetype = "dashed") +
+  ylim(c(0,14000))
 
 classes <- ggplot(working_dataset_result) + 
   geom_bar(aes(x = transport_mode)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ylim(c(0,700)) +
-  geom_hline(yintercept = 500, colour = "red", linetype = "dashed")
+  geom_hline(yintercept = 500, colour = "red", linetype = "dashed") +
+  ylim(c(0,14000))
 
 grid.arrange(classes, final_classes, nrow = 1)
+table(working_dataset_result$transport_mode)
+table(working_dataset_result$model.final)
 ```
 
 ```{r}
@@ -531,29 +521,8 @@ map <- mapview(wrong_points,
 map
 ```
 
-```{r Accuracy}
 
-# Confusion Matrix
-# Note: Only works if result and working dataset have identical transport modes as factors.
-(conf_matrix <- confusionMatrix(as.factor(working_dataset_result$transport_mode), as.factor(working_dataset_result$model.final)))
 
-# Precision for each class
-(precision <- conf_matrix$byClass[, "Precision"])
-
-# Recall for each class
-(recall <- conf_matrix$byClass[, "Recall"])
-
-# F1-Score for each class
-(f1_score <- conf_matrix$byClass[, "F1"])
-```
-
-Confusion Matrix:
-
-Precision: Precision measures the proportion of correctly predicted positive instances out of the total instances predicted as positive. It is useful when the focus is on minimizing false positives.
-
-Recall (Sensitivity or True Positive Rate): Recall measures the proportion of correctly predicted positive instances out of the total actual positive instances. It is useful when the goal is to minimize false negatives.
-
-F1-Score: The F1-score combines precision and recall into a single metric. It provides a balance between precision and recall and is useful when both false positives and false negatives are important.
 
 # Post Processing
 
@@ -592,16 +561,27 @@ single_point_correction <- function(df, x, threshold_percentage, iterations) {
         changed_count <- changed_count + 1
       }
     }
+  message("Metrics after each iteration:")
+  print(conf_matrix_func <- confusionMatrix(as.factor(df$transport_mode), as.factor(df$model.final)))
+  # Precision for each class
+  print(precision_func <- conf_matrix_func$byClass[, "Precision"])
+  # Recall for each class
+  print(recall_func <- conf_matrix_func$byClass[, "Recall"])
+  # F1-Score for each class
+  print(f1_score_func <- conf_matrix_func$byClass[, "F1"])
+  
   }
   
   message("Number of times the condition is true and values are updated:", changed_count)
+  
+
   return(df)
 }
  
 
+working_dataset_result_copy <- working_dataset_result
 
-
-working_dataset_result <- single_point_correction(working_dataset_result, 5, 0.75, 1)
+working_dataset_result <- single_point_correction(working_dataset_result, 10, 0.65, 5)
 
 ```
 
@@ -626,16 +606,21 @@ working_dataset_result <- single_point_correction(working_dataset_result, 5, 0.7
 final_classes <- ggplot(working_dataset_result) + 
   geom_bar(aes(x = model.final)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ylim(c(0,700)) +
-  geom_hline(yintercept = 500, colour = "red", linetype = "dashed")
+  ylim(c(0,14000)) +
+  geom_hline(yintercept = 500, colour = "red", linetype = "dashed") + 
+  ggtitle("Class Distribution \nAfter Undersampling")
 
 classes <- ggplot(working_dataset_result) + 
   geom_bar(aes(x = transport_mode)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ylim(c(0,700)) +
-  geom_hline(yintercept = 500, colour = "red", linetype = "dashed")
+  ylim(c(0,14000)) +
+  geom_hline(yintercept = 500, colour = "red", linetype = "dashed") + 
+  ggtitle("Class Distribution \nAfter Classification")
+
 
 grid.arrange(classes, final_classes, nrow = 1)
+table(working_dataset_result$transport_mode)
+table(working_dataset_result$model.final)
 ```
 
 # 6. Evaluation
@@ -644,4 +629,4 @@ grid.arrange(classes, final_classes, nrow = 1)
 
 # Literature
 
-https://findingspress.org/article/14520-classifying-transport-mode-from-global-positioning-systems-and-accelerometer-data-a-machine-learning-approach
+Roy, A., Fuller, D., Stanley, K., & Nelson, T. (2020). Classifying transport mode from global positioning systems and accelerometer data: a machine learning approach. Findings.
