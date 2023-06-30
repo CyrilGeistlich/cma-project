@@ -1,12 +1,15 @@
-
-=======
 ---
-title: The title of your Semesterproject
-subtitle: A subtle subtitle
-author: Cyril Geistlich and Micha Franz
-output: html
+title: Automated Transport Mode Detection of GPS Tracking Data
+author: Cyril Geistlich, Micha Franz
+format: 
+  html:
+    code-fold: true
+    toc: true
+    toc_float: true
+    css: style.css
+    bibliography: bibtex.bib
+    csl: chicago-fullnote.csl
 ---
-
 
 <!-- You can add  your R Code with Code chunks-->
 
@@ -15,9 +18,6 @@ output: html
 #| warning: false
 #| message: false
 
-# You can set chunk options individually per code chunk, as was done with this
-# code chunk.
-
 # echo: false           hides the code from the generated output
 # warning: false        hides warnings from the generated output
 # message: false        hides messages from the generated output
@@ -25,25 +25,33 @@ output: html
 
 ```
 
-
-
 ## Abstract
 
 This project aims to investigate key factors and features in GPS tracking data to differentiate transportation vehicles. Machine learning is applied to automate transportation mode detection using spatial, temporal, and attribute analysis. Manual verification of results ensures accuracy. The findings contribute to computational movement analysis and automated transportation mode detection.
 
 ## Introduction
 
-## Research Question
+In recent years, the spread of GPS-enabled devices and progress in location-based technologies have generated vast amounts of GPS tracking data. This data holds large significant potential for extracting insights and to improve our understanding of human mobility patterns. One main application in this field is the differentiation of transportation modes. This can benefit various domains such as traffic management or urban planning. Determining the mode of transportation from GPS tracking data presents several challenges. With the ubiquitous increase of GPS tracking through smartphones and other technical devices, it's too time consuming and expensive to manually annotate data and also prone to human error or biases. This leads to the following two research questions:
 
-What are the key factors and features that can be extracted from GPS tracking data to differentiate between different types of transportation modes? How can machine learning techniques be applied to GPS tracking data to automate the detection of the mode of transportation and which accuracies can be achieved by different machine learning algorithms?
+<span style="color:#007090;"> 
+**What are the key factors and features that can be extracted from GPS tracking data to differentiate between different types of transportation modes?**
+</span>
 
-## Material and Methods
+<span style="color:#007090;"> 
+**How can machine learning techniques be applied to GPS tracking data to automate the detection of the mode of transportation and which accuracies can be achieved by different machine learning algorithms?**
+</span>
 
-<!-- the following is just a placeholder text, remove it!-->
+The project will focus on exploring spatial and temporal aspects to extract key factors from GPS tracking data, such as velocity, sinuosity or angles. Additionally, spatial context in the form of traffic networks and land cover is added to the data in order to improve the accuracy of transportation mode detection. Machine learning algorithms will be tested and employed to automate the classification of transportation modes. An accurate algorithm is aimed to be found by training and evaluating different models on labeled data. These models include random forests, support vector machines or neural networks. To ensure the accuracy of the models, a subset of the classified data is used to validate the performance. By comparing the results of the automated classification with ground truth data, the project aims to assess the achieved accuracies of different machine learning algorithms and identify areas for improvement.
 
-### Removing false movement and static points
+## Data & Methods
 
-When tracking a person throughout the day using GPS data, there are instances where the person appears to be stationary, such as when in an office or at a university. However, due to GPS inaccuracies, these stationary points may not appear at the exact same location and can exhibit erratic movement patterns. The accuracy of GPS signals is often compromised in dense buildings, amplifying this phenomenon. As a result, parameters like velocity and step length can show values that are typically associated with other categories. To address this issue, two approaches have been employed. 
+### Data
+
+The main data are the GPS tracking data, which were recorded through the Posmos App via smartphone throughout a time span of approximately two months by the two authors. The complete collected data was manually labelled to ensure a valid ground truth. Further, spatial context data such as the Swiss road network, tram network [@swisstopo], train network [@sbb] and the bus network of the cantons of Zurich [@zvv] and Bern [@geo_bern] (Note: There is no official bus network for the entire Switzerland according to the federal bureau of transport, thus we used the available ones for Bern and Zurich, where a significant amount of data points pertaining to bus usage were collected.) To facilitate the detection of the transportation mode boat, land cover data containing all Swiss waters was also used [@swisstopo].
+
+### Preprocessing
+
+When tracking a person throughout the day using GPS data, there are instances where the person appears to be stationary, such as when in an office or at a university. However, due to GPS inaccuracies, these stationary points may not appear at the exact same location and can exhibit erratic movement patterns. The accuracy of GPS signals is often compromised in dense buildings, amplifying this phenomenon. As a result, parameters like velocity and step length can show values that are typically associated with other categories. To address this issue, two approaches have been employed.
 
 The first approach involves analyzing the angles between consecutive points. Typically, these angles are significantly smaller for stationary points compared to other movements. By visually determining a threshold angle (X), the dataset is filtered to remove all data points with angles smaller than X. This process needs to be repeated iteratively until no angles below the threshold remain, as the removal of data points alters the angles between the remaining points.
 
@@ -51,19 +59,7 @@ The second approach considers the distance between the current point and a set n
 
 Finding the optimal compromise between these filtering approaches involves considering the specific characteristics of the tracked person's movements and the quality of the GPS data. By iteratively applying the angle-based filtering and analyzing the distance to surrounding points, a more accurate identification of stationary periods can be achieved, mitigating the impact of GPS inaccuracies and preserving the integrity of the tracking data.
 
-## Results
 
-<!-- the following is just a placeholder text, remove it!-->
-
-Philosophy oneself passion play fearful self noble zarathustra deceptions sexuality. Endless ocean of oneself dead ocean. Selfish decrepit.
-
-## Discussion
-
-<!-- the following is just a placeholder text, remove it!-->
-
-Justice convictions spirit sexuality insofar free marvelous joy. Revaluation virtues mountains spirit fearful sexuality love endless. Society intentions will noble burying aversion moral. Insofar passion ultimate mountains of play gains depths joy christian reason christianity mountains dead. Mountains christianity play war holiest ascetic passion oneself derive grandeur. Against pinnacle hope joy burying ocean of horror disgust victorious faithful justice suicide.
-
-## Code
 
 ```{r, warning = F}
 library("dplyr")
@@ -77,7 +73,7 @@ library("caret")
 library("LearnGeom") # to calculate angle
 library("geosphere") # to calculate distances
 library("RColorBrewer") # to create custom color palettes
-library("ggcorrplot")
+library("ggcorrplot") # for correlation matrix
 library("ROSE")
 library("gridExtra")
 ```
@@ -156,11 +152,6 @@ bus_netz <- st_union(bus_netz_bern, bus_netz_zvv)
 ## 1.2.1 Clean and preprocess data
 
 ```{r preprocess data}
-
-# posmo_raw <- read.delim("data/posmo_26_05_2023.csv",sep=",")
-# posmo_raw <- st_as_sf(posmo_raw,coords=c("lon_x", "lat_y"), crs = 2056)
-#mapview(posmo_truth)
-
 process_posmo_data <- function(posmo_data) { # function with preprocessing steps
 
   # Convert to sf object
@@ -199,8 +190,8 @@ process_posmo_data <- function(posmo_data) { # function with preprocessing steps
 # working_dataset <- posmo_micha_truth
 ```
 
-
 ### 1.2.2 Remove static data points
+
 ```{r function to filter static points using moving distance}
 filterStaticByDistance <- function(data, threshold_distance, consecutive_points) {
   require(geosphere)
@@ -232,7 +223,6 @@ filterStaticByDistance <- function(data, threshold_distance, consecutive_points)
 }
 ```
 
-
 ```{r Function to calculate angle }
 getAngle <- function(coords) {
   angles <- numeric(nrow(coords)) # Initialize angles as a numeric vector
@@ -251,7 +241,6 @@ getAngle <- function(coords) {
 }
 ```
 
-
 ```{r function to remove static points by angle}
 filterStaticByAngle <- function(working_dataset, angleTreshold){
   coords <- data.frame(st_coordinates(working_dataset), working_dataset$id)  
@@ -268,8 +257,6 @@ filterStaticByAngle <- function(working_dataset, angleTreshold){
   return(working_dataset)
 }
 ```
-
-
 
 ```{r Actual removal of static points}
 
@@ -304,7 +291,6 @@ filterStaticByAngle <- function(working_dataset, angleTreshold){
 #   mapview(unfiltered_data_line, color="#901010", lwd=2)
   
 ```
-
 
 ## 1.3 Segmentation?
 
@@ -411,7 +397,6 @@ run_all <- function(df){
 
 ```
 
-
 ```{r combine data}
 
 working_dataset <- run_all(posmo_micha_truth_csv)
@@ -428,8 +413,8 @@ posmo_pool <- rbind(processed_2,processed_3,processed_4)
 
 ```
 
-
 ### 1.4.5 Closeness to Traffic Network and Water Bodies
+
 ```{r}
 data_AOI <- st_buffer(working_dataset, 50) %>% st_union()
 
@@ -483,12 +468,12 @@ posmo_pool$distance_bus <- ifelse(posmo_pool$distance_bus > 100, 100, posmo_pool
 posmo_pool$distance_strasse <- as.numeric(st_distance(posmo_pool, strassen))
 posmo_pool$distance_strasse <- ifelse(posmo_pool$distance_strasse > 100, 100, posmo_pool$distance_strasse)
 ```
+
 ### 1.4.6 Slope?
 
 ### 1.4.7 Average Distance between points in section
 
 ### Further Parameters!
-
 
 ## Clean Data
 
@@ -525,7 +510,6 @@ sinuosity_plot
 working_dataset_copy <- working_dataset
 ```
 
-
 # 2.PCA?
 
 ```{r}
@@ -546,7 +530,6 @@ test <- data_pca$loadings
 scores <- as.data.frame(data_pca$scores)
 ```
 
-
 ```{r}
 # Save full dataset as csv
 working_dataset <- st_drop_geometry(working_dataset)
@@ -556,7 +539,27 @@ write.csv(working_dataset, file = "data/full_working_dataset.csv", row.names = F
 write.csv(posmo_pool, file = "data/full_posmo_pool_dataset.csv", row.names = F)
 ```
 
-# 3. Categories
+## Results
 
-Stationary? Walk (Running?) Bike Train Tram Bus Car Skateboard E-Scooter Boat Other
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce semper maximus urna, ut aliquet massa hendrerit sed. Ut sed nisi non tellus placerat lacinia vitae nec ipsum. Nulla ut nisl non ex auctor pharetra. In efficitur mi non nibh malesuada, eu dapibus est cursus. Nulla feugiat nisi metus, eget laoreet elit congue non. Nam et mauris sed leo tincidunt fermentum ac at leo. Morbi tincidunt vestibulum turpis, nec consectetur dolor placerat a. Integer dapibus, est sit amet tincidunt pellentesque, elit elit sagittis erat, nec rutrum est nunc ut libero.
 
+Phasellus lobortis purus eu purus fermentum, vitae mattis nunc malesuada. Aliquam semper mauris eget nisl fringilla, eget feugiat nulla viverra. Vestibulum vestibulum nisi a purus pellentesque, et tincidunt nisl pulvinar. Mauris id rutrum lorem. Etiam cursus efficitur nisl, vel finibus turpis aliquam ac. Cras in est sit amet tortor tincidunt efficitur. Maecenas ac est bibendum, pharetra neque a, consectetur nisi. Maecenas ultrices ultricies ipsum id ullamcorper. Donec fringilla sem eu tortor dictum ullamcorper.
+
+Vestibulum varius nunc et eleifend sollicitudin. Maecenas facilisis urna quis sapien bibendum, et gravida sem rutrum. Nam accumsan tortor sit amet turpis dapibus, et varius ligula pharetra. Mauris consectetur, arcu auctor ullamcorper finibus, justo massa convallis purus, in eleifend lectus felis in odio. Sed efficitur mi ac felis facilisis aliquam. Aliquam consequat sem ut augue vulputate viverra. In nec fringilla sapien. Donec sit amet pharetra turpis. Curabitur vel tellus sed odio ultrices volutpat a at lacus.
+
+Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Curabitur placerat dui ut vestibulum malesuada. Duis lobortis ipsum a commodo tincidunt. Fusce eu elit id risus dapibus feugiat. Vivamus eget fringilla nisl. Nullam suscipit massa ut dapibus efficitur. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nec diam rutrum, pulvinar libero sit amet, viverra justo. Sed efficitur magna eget risus luctus, vel feugiat quam varius. Morbi finibus justo nec ex semper, ut gravida mauris vulputate.
+
+Nullam mollis elementum metus ac congue. Fusce porttitor sem quis augue fermentum, id tempus leo bibendum. Nam malesuada justo quis consectetur tristique. Nullam ullamcorper enim ut faucibus aliquam. Donec et purus urna. Pellentesque sed neque elit. Mauris commodo dui eget dui tempor dictum. Nulla facilisi. Quisque venenatis sollicitudin est, vel tristique lacus gravida ac. Sed vehicula nibh id libero commodo interdum.
+
+## Discussion
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce semper maximus urna, ut aliquet massa hendrerit sed. Ut sed nisi non tellus placerat lacinia vitae nec ipsum. Nulla ut nisl non ex auctor pharetra. In efficitur mi non nibh malesuada, eu dapibus est cursus. Nulla feugiat nisi metus, eget laoreet elit congue non. Nam et mauris sed leo tincidunt fermentum ac at leo. Morbi tincidunt vestibulum turpis, nec consectetur dolor placerat a. Integer dapibus, est sit amet tincidunt pellentesque, elit elit sagittis erat, nec rutrum est nunc ut libero.
+
+Phasellus lobortis purus eu purus fermentum, vitae mattis nunc malesuada. Aliquam semper mauris eget nisl fringilla, eget feugiat nulla viverra. Vestibulum vestibulum nisi a purus pellentesque, et tincidunt nisl pulvinar. Mauris id rutrum lorem. Etiam cursus efficitur nisl, vel finibus turpis aliquam ac. Cras in est sit amet tortor tincidunt efficitur. Maecenas ac est bibendum, pharetra neque a, consectetur nisi. Maecenas ultrices ultricies ipsum id ullamcorper. Donec fringilla sem eu tortor dictum ullamcorper.
+
+Vestibulum varius nunc et eleifend sollicitudin. Maecenas facilisis urna quis sapien bibendum, et gravida sem rutrum. Nam accumsan tortor sit amet turpis dapibus, et varius ligula pharetra. Mauris consectetur, arcu auctor ullamcorper finibus, justo massa convallis purus, in eleifend lectus felis in odio. Sed efficitur mi ac felis facilisis aliquam. Aliquam consequat sem ut augue vulputate viverra. In nec fringilla sapien. Donec sit amet pharetra turpis. Curabitur vel tellus sed odio ultrices volutpat a at lacus.
+
+Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Curabitur placerat dui ut vestibulum malesuada. Duis lobortis ipsum a commodo tincidunt. Fusce eu elit id risus dapibus feugiat. Vivamus eget fringilla nisl. Nullam suscipit massa ut dapibus efficitur. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nec diam rutrum, pulvinar libero sit amet, viverra justo. Sed efficitur magna eget risus luctus, vel feugiat quam varius. Morbi finibus justo nec ex semper, ut gravida mauris vulputate.
+
+Nullam mollis elementum metus ac congue. Fusce porttitor sem quis augue fermentum, id tempus leo bibendum. Nam malesuada justo quis consectetur tristique. Nullam ullamcorper enim ut faucibus aliquam. Donec et purus urna. Pellentesque sed neque elit. Mauris commodo dui eget dui tempor dictum. Nulla facilisi. Quisque venenatis sollicitudin est, vel tristique lacus gravida ac. Sed vehicula nibh id libero commodo interdum.
+
+# References
