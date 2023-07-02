@@ -424,7 +424,7 @@ posmo_pool$distance_strasse <- as.numeric(st_distance(posmo_pool, strassen))
 posmo_pool$distance_strasse <- ifelse(posmo_pool$distance_strasse > 100, 100, posmo_pool$distance_strasse)
 ```
 
-```{r post_cleaning_data, warning = FALSE, message=FALSE}
+```{r post_cleaning_data, warning = FALSE, message=FALSE, out.width="100%"}
 # Replace NA values with a specified value (e.g., mean, median, or 0)
 
 working_dataset$sinuosity[is.infinite(working_dataset$sinuosity)] <- NA
@@ -481,7 +481,7 @@ write.csv(posmo_pool, file = "data/full_posmo_pool_dataset.csv", row.names = F)
 
 ### 3.4 Class Distribution Overview
 
-```{r load_data_2 , warning = FALSE, message=FALSE}
+```{r load_data_2 , warning = FALSE, message=FALSE, out.width="100%"}
 working_dataset <- read.delim("data/full_working_dataset.csv",sep=",", header = T) 
 posmo_pool <- read.delim("data/full_posmo_pool_dataset.csv",sep=",", header = T) 
 
@@ -498,7 +498,7 @@ ggplot(working_dataset) +
 
 The distribution shows that many classes are very poorly represented in the data. Unclassified data is removed and aggregated. The underrepresented transport modes are moved to the class "Other".
 
-```{r filtering_classes, warning = FALSE, message=FALSE}
+```{r filtering_classes, warning = FALSE, message=FALSE, out.width="100%"}
 # Remove unwanted classes
 working_dataset <- working_dataset[working_dataset$transport_mode != "", ]
 working_dataset <- working_dataset[working_dataset$transport_mode != "Other1", ]
@@ -535,7 +535,7 @@ The dotted red line lies at a count of 500, representing the desired sample coun
 
 The sampling intervals were found to be highly inconsistent. Many large sampling intervals originate from the tracked person being stationary. Therefore the sampling interval is limited to 60 seconds. No re-sampling to equalize the sampling interval is undertaken, to preserve the GPS position and the calculated parameters for each data point, since with large sampling intervals the calculated movement parameters become inaccurate and unrepresentative of the transport mode. After applying the threshold the actual sampling interval of 10, respective 15 seconds can be seen in the box plot.
 
-```{r sampling_interval, warning = FALSE, message=FALSE}
+```{r sampling_interval, warning = FALSE, message=FALSE, out.width="100%"}
 
 boxplot_diff_s <- ggplot(working_dataset,aes(x = transport_mode, y = diff_s)) +
   geom_boxplot() +
@@ -559,7 +559,7 @@ grid.arrange(boxplot_diff_s, boxplot_diff_s_after, nrow = 1)
 
 After the initial removal of sampling intervals larger than 60 seconds we repeat the step for the moving window sampling intervals.
 
-```{r boxplots, warning = FALSE, message=FALSE}
+```{r boxplots, warning = FALSE, message=FALSE, out.width="100%"}
 
 boxplot_diff_s_mean <- ggplot(working_dataset, aes(x = transport_mode, y = diff_s_mean)) +
   geom_boxplot() +
@@ -588,7 +588,7 @@ The velocity attribute shows some outliers for the train class and walking class
 
 -   GPS inaccuracies, where the GPS point location is "jumping" creating very inaccurate, zigzagging tracking data.
 
-```{r visualise_parameters, warning = FALSE, message=FALSE}
+```{r visualise_parameters, warning = FALSE, message=FALSE, out.width="100%"}
 boxplot_velocity <- ggplot(working_dataset, aes(x = transport_mode, y = velocity)) +
   geom_boxplot() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -613,7 +613,7 @@ grid.arrange(boxplot_velocity, boxplot_velocity_after, nrow = 1)
 
 The moving window velocity shows less extreme outliers. The number of outliers can be reduced further by removing setting the trheshold to 55.5m/s (200km/h). After applying the threshold classes with similar average velocities can be identified. This might already be an indicator for classes which are difficult to distinguish using classification methods.
 
-```{r velocity_threshold, warning = FALSE, message=FALSE}
+```{r velocity_threshold, warning = FALSE, message=FALSE, out.width="100%"}
 boxplot_velocity_mean <- ggplot(working_dataset, aes(x = transport_mode, y = velocity_mean)) +
   geom_boxplot() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -636,7 +636,7 @@ grid.arrange(boxplot_velocity_mean, boxplot_velocity_mean_after, nrow = 1)
 
 The acceleration threshold is set to 10m/s\^2, as for this classification is considered to be the maximum possible acceleration for all classes. The distribution of the classes is similar to the velocities. In the parameter correlation analysis strong correlation between velocity and acceleration was found.
 
-```{r acceleration_threshold, warning = FALSE, message=FALSE}
+```{r acceleration_threshold, warning = FALSE, message=FALSE, out.width="100%"}
 boxplot_acceleration <- ggplot(working_dataset, aes(x = transport_mode, y = acceleration)) +
   geom_boxplot() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -658,7 +658,7 @@ grid.arrange(boxplot_acceleration, boxplot_acceleration_after, nrow = 1)
 
 The acceleration threshold is set to $10m/s^2$, as for the single point acceleration values.
 
-```{r acceleration_threshold2, warning = FALSE, message=FALSE}
+```{r acceleration_threshold2, warning = FALSE, message=FALSE, out.width="100%"}
 
 boxplot_acceleration_mean <- ggplot(working_dataset, aes(x = transport_mode, y = acceleration_mean)) +
   geom_boxplot() +
@@ -682,7 +682,7 @@ grid.arrange(boxplot_acceleration_mean, boxplot_acceleration_mean_after, nrow = 
 
 The data set is strongly imbalanced. To improve model accuracy we use under sampling to balance the classes. 500 samples per class are desired. The classes "boat" and "other" do not have sufficient points. The sample size is not further decreased, so enough data is provided to train the and test the computed models.
 
-```{r undersampling, warning = FALSE, message=FALSE}
+```{r undersampling, warning = FALSE, message=FALSE, out.width="100%"}
 # Create copy for later use
 working_dataset_full <- working_dataset
 
@@ -936,7 +936,7 @@ saveRDS(model.svmPoly.cv, "models/model_svmPoly_cv.rds")
 
 Since the polynomial SVM showed the best performance, this model is used to predict the transport mode on the full data set, containing 40'529 data points after pre processing and threshold filtering. The achieved overall accuracy is 82.1% with the 95% confidence interval of \[81.73%, 82.48%\]. The full data set is very imbalanced, nevertheless the unweighted averaged F1-score lies at 80.7%
 
-```{r start_classification, warning = FALSE, message=FALSE}
+```{r start_classification, warning = FALSE, message=FALSE, out.width="100%"}
 # Set seed for reproducibility
 set.seed(100)
 
@@ -988,7 +988,7 @@ write.csv(working_dataset_result, "data/working_dataset_result.csv", row.names =
 
 The resulting class distribution shows that the model predicts too many points as train. This boosts the models performance, since the train class is strongly over represented in this data set. Between the transport modes Car, Bus, Bike and Tram we expected many false classifications, since key parameters such as velocity and acceleration lie in similar ranges and are difficult to distinguish by the model.
 
-```{r show_class_distribution, warning = FALSE, message=FALSE}
+```{r show_class_distribution, warning = FALSE, message=FALSE, out.width="100%"}
 # Show class distribution
 final_classes <- ggplot(working_dataset_full) + 
   geom_bar(aes(x = model.final)) +
@@ -1068,15 +1068,12 @@ single_point_correction <- function(df, x, threshold_percentage, iterations) {
 
   return(df)
 }
- 
 
 working_dataset_result_copy <- working_dataset_result
-
 working_dataset_result <- single_point_correction(working_dataset_result, 10, 0.75, 3)
-
 ```
 
-```{r evaluation, warning = FALSE, message=FALSE}
+```{r evaluation, warning = FALSE, message=FALSE, out.width="100%"}
 # Confusion Matrix for new results
 conf_matrix_2 <- confusionMatrix(as.factor(working_dataset_result$transport_mode), as.factor(working_dataset_result$model.final))
 cat("Confusion Matrix:\n")
@@ -1116,7 +1113,7 @@ avg_f1_score
 
 After the preprocessing there was not significant difference in the class distribution.
 
-```{r show_class_distribution2, warning = FALSE, message=FALSE}
+```{r show_class_distribution2, warning = FALSE, message=FALSE, out.width="100%"}
 # Show class distribution
 final_classes <- ggplot(working_dataset_result) + 
   geom_bar(aes(x = model.final)) +
@@ -1162,6 +1159,6 @@ By incorporating these improvements, we can enhance the classification accuracy 
 
 # References
 
-```{r}
+```{r wordcount, warning = FALSE, message=FALSE}
 wordcountaddin::text_stats("index.qmd")
 ```
