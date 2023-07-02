@@ -6,6 +6,7 @@ body {
   font-family: 'Montserrat', sans-serif;
   background: linear-gradient(42deg, rgba(151,234,235,0.5) 0%, rgba(249,231,193,0.5) 100%);
   /*background-image: url("background.jpg");*/
+  margin: 10hv;
 }
 
 h1 {
@@ -14,4 +15,8 @@ h1 {
 
 hr {
   border: 0.5px solid gray;
+}
+
+p {
+  text-align: justify;
 }
